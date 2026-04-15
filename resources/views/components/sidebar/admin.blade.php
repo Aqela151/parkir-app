@@ -1,0 +1,120 @@
+{{-- components/sidebar/admin.blade.php --}}
+
+<style>
+    .sidebar {
+        width: 240px;
+        background-color: #1C1C1E;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        left: 0; top: 0; bottom: 0;
+        border-right: 1px solid #2a2a2a;
+        font-family: 'Manrope', sans-serif;
+    }
+
+    .sidebar-header { padding: 28px 24px 20px; }
+
+    .sidebar-logo {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 12px;
+    }
+
+    .sidebar-logo .park { color: #ffffff; }
+    .sidebar-logo .sys  { color: #F8C61E; }
+
+    .role-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        border: 1.5px solid #F8C61E;
+        color: #F8C61E;
+        background: rgba(248,198,30,0.08);
+    }
+
+    .sidebar-divider { height: 1px; background: #2a2a2a; }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: #555;
+        text-transform: uppercase;
+        padding: 16px 12px 8px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: #888;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        margin-bottom: 2px;
+    }
+
+    .nav-item i { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+
+    .nav-item:hover { background-color: #2a2a2a; color: #fff; }
+
+    .nav-item.active {
+        background-color: rgba(248,198,30,0.1);
+        color: #F8C61E;
+        font-weight: 600;
+    }
+
+    .nav-item.active i { color: #F8C61E; }
+</style>
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <span class="park">Park</span><span class="sys">Sys</span>
+        </div>
+        <span class="role-badge">ADMIN</span>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <nav class="sidebar-nav">
+        <span class="nav-section-label">Overview</span>
+        <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <i class="fa-solid fa-border-all"></i> Dashboard
+        </a>
+
+        <span class="nav-section-label">Master Data</span>
+        <a href="{{ route('admin.tarif-parkir') }}" class="nav-item {{ request()->routeIs('admin.tarif-parkir*') ? 'active' : '' }}">
+            <i class="fa-regular fa-clock"></i> Tarif Parkir
+        </a>
+        <a href="{{ route('admin.area-parkir') }}" class="nav-item {{ request()->routeIs('admin.area-parkir*') ? 'active' : '' }}">
+            <i class="fa-solid fa-location-dot"></i> Area Parkir
+        </a>
+        <a href="{{ route('admin.kendaraan') }}" class="nav-item {{ request()->routeIs('admin.kendaraan*') ? 'active' : '' }}">
+            <i class="fa-solid fa-car"></i> Kendaraan
+        </a>
+
+        <span class="nav-section-label">User Management</span>
+        <a href="{{ route('admin.registrasi-user') }}" class="nav-item {{ request()->routeIs('admin.registrasi-user*') ? 'active' : '' }}">
+            <i class="fa-regular fa-user"></i> Registrasi User
+        </a>
+        <a href="{{ route('admin.log-aktivitas') }}" class="nav-item {{ request()->routeIs('admin.log-aktivitas*') ? 'active' : '' }}">
+            <i class="fa-regular fa-file-lines"></i> Log Aktivitas
+        </a>
+    </nav>
+</aside>
