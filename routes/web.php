@@ -55,21 +55,30 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::put('/area-parkir/{id}',         [AreaParkirController::class, 'update'])->name('area-parkir.update');
     Route::delete('/area-parkir/{id}',      [AreaParkirController::class, 'destroy'])->name('area-parkir.destroy');
 
-    Route::get('/log-aktivitas', fn() => view('admin.log-aktivitas'))->name('log-aktivitas');
+    Route::get('/log-aktivitas', [\App\Http\Controllers\AdminController::class, 'logAktivitas'])->name('log-aktivitas');
 });
 
 // PETUGAS
 Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])->group(function () {
-    Route::get('/dashboard', fn() => view('petugas.dashboard'))->name('dashboard');
-    Route::get('/transaksi', fn() => view('petugas.transaksi'))->name('transaksi');
-    Route::get('/riwayat-transaksi', fn() => view('petugas.riwayat-transaksi'))->name('riwayat-transaksi');
-    Route::get('/status-area', fn() => view('petugas.status-area'))->name('status-area');
+    Route::get('/dashboard', [\App\Http\Controllers\PetugasDashboardController::class, 'index'])->name('dashboard');
+    
+    // Transaksi routes
+    Route::prefix('transaksi')->name('transaksi.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\PetugasTransaksiController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\PetugasTransaksiController::class, 'store'])->name('store');
+        Route::get('/{id}/keluar', [\App\Http\Controllers\PetugasTransaksiController::class, 'keluar'])->name('keluar');
+        Route::get('/{id}/struk', [\App\Http\Controllers\PetugasTransaksiController::class, 'struk'])->name('struk');
+    });
+    
+    Route::get('/riwayat-transaksi', [\App\Http\Controllers\PetugasTransaksiController::class, 'riwayat'])->name('riwayat-transaksi');
+    Route::get('/riwayat-transaksi/{id}/struk', [\App\Http\Controllers\PetugasTransaksiController::class, 'struk'])->name('riwayat-transaksi.struk');
+    Route::get('/status-area', [\App\Http\Controllers\PetugasDashboardController::class, 'statusArea'])->name('status-area');
 });
 
 // OWNER
 Route::prefix('owner')->name('owner.')->middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/dashboard', fn() => view('owner.dashboard'))->name('dashboard');
-    Route::get('/rekap-transaksi', fn() => view('owner.rekap-transaksi'))->name('rekap-transaksi');
-    Route::get('/grafik-pendapatan', fn() => view('owner.grafik-pendapatan'))->name('grafik-pendapatan');
+    Route::get('/rekap-transaksi', [\App\Http\Controllers\OwnerController::class, 'rekapTransaksi'])->name('rekap-transaksi');
+    Route::get('/grafik-pendapatan', [\App\Http\Controllers\OwnerController::class, 'grafikPendapatan'])->name('grafik-pendapatan');
     Route::get('/performa-area', fn() => view('owner.performa-area'))->name('performa-area');
 });

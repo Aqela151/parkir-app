@@ -264,6 +264,12 @@
     </table>
 </div>
 
+@if($logs instanceof \Illuminate\Pagination\Paginator)
+    <div style="margin-top: 24px; display: flex; justify-content: center;">
+        {{ $logs->links() }}
+    </div>
+@endif
+
 <script>
     // Search functionality
     document.getElementById('searchInput').addEventListener('input', function () {

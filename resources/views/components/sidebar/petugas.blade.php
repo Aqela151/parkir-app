@@ -97,7 +97,7 @@
         <a href="{{ route('petugas.dashboard') }}" class="nav-item {{ request()->routeIs('petugas.dashboard') ? 'active' : '' }}">
             <i class="fa-solid fa-border-all"></i> Dashboard
         </a>
-        <a href="{{ route('petugas.transaksi') }}" class="nav-item {{ request()->routeIs('petugas.transaksi*') ? 'active' : '' }}">
+        <a href="{{ route('petugas.transaksi.index') }}" class="nav-item {{ request()->routeIs('petugas.transaksi*') ? 'active' : '' }}">
             <i class="fa-regular fa-pen-to-square"></i> Transaksi Parkir
         </a>
         <a href="{{ route('petugas.riwayat-transaksi') }}" class="nav-item {{ request()->routeIs('petugas.riwayat-transaksi*') ? 'active' : '' }}">

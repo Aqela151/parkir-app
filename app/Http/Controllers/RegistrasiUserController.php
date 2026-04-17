@@ -21,6 +21,7 @@ class RegistrasiUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
             'username' => 'required|string|max:255|unique:users',
             'password' => 'required|string|min:8',
             'penempatan' => 'required|string|max:255',
@@ -29,6 +30,7 @@ class RegistrasiUserController extends Controller
 
         User::create([
             'name' => $request->name,
+            'email' => $request->email,
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'penempatan' => $request->penempatan,
@@ -46,6 +48,7 @@ class RegistrasiUserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'username' => 'required|string|max:255|unique:users,username,' . $id,
             'password' => 'nullable|string|min:8',
             'penempatan' => 'required|string|max:255',
@@ -54,6 +57,7 @@ class RegistrasiUserController extends Controller
 
         $data = [
             'name' => $request->name,
+            'email' => $request->email,
             'username' => $request->username,
             'penempatan' => $request->penempatan,
             'role' => $request->role,

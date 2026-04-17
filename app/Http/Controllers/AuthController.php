@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,8 +29,16 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+            
+            // Log login activity
+            $user = Auth::user();
+            LogAktivitas::create([
+                'user_id' => $user->id,
+                'aktivitas' => 'Login ke sistem',
+                'lokasi' => $user->penempatan,
+            ]);
 
-            return match (Auth::user()->role) {
+            return match ($user->role) {
                 'admin'   => redirect()->intended(route('admin.dashboard')),
                 'petugas' => redirect()->intended(route('petugas.dashboard')),
                 'owner'   => redirect()->intended(route('owner.dashboard')),
@@ -44,6 +53,17 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+        
+        // Log logout activity
+        if ($user) {
+            LogAktivitas::create([
+                'user_id' => $user->id,
+                'aktivitas' => 'Logout dari sistem',
+                'lokasi' => $user->penempatan,
+            ]);
+        }
+        
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
