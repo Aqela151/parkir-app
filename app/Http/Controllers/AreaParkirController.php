@@ -18,9 +18,8 @@ class AreaParkirController extends Controller
         $request->validate([
             'nama_area' => 'required|string',
             'lokasi' => 'nullable|string',
-            'kapasitas_mobil' => 'required|integer|min:0',
-            'kapasitas_motor' => 'required|integer|min:0',
-            'kapasitas_bus' => 'required|integer|min:0',
+            'kapasitas' => 'required|integer|min:0',
+            'terisi' => 'nullable|integer|min:0',
             'status' => 'required|in:aktif,penuh,maintenance',
         ]);
 
@@ -36,9 +35,8 @@ class AreaParkirController extends Controller
         $request->validate([
             'nama_area' => 'required|string',
             'lokasi' => 'nullable|string',
-            'kapasitas_mobil' => 'required|integer|min:0',
-            'kapasitas_motor' => 'required|integer|min:0',
-            'kapasitas_bus' => 'required|integer|min:0',
+            'kapasitas' => 'required|integer|min:0',
+            'terisi' => 'nullable|integer|min:0',
             'status' => 'required|in:aktif,penuh,maintenance',
         ]);
 

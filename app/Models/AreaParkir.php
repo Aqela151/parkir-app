@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AreaParkir extends Model
 {
-    protected $fillable = ['nama_area', 'lokasi', 'kapasitas_mobil', 'kapasitas_motor', 'kapasitas_bus', 'status'];
+    protected $fillable = ['nama_area', 'lokasi', 'kapasitas', 'terisi', 'status'];
     
     protected $table = 'area_parkirs';
 

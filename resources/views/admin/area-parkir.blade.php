@@ -345,9 +345,8 @@
                 <th>#</th>
                 <th>NAMA AREA</th>
                 <th>ALAMAT</th>
-                <th>MOBIL</th>
-                <th>MOTOR</th>
-                <th>BUS</th>
+                <th>KAPASITAS</th>
+                <th>TERISI</th>
                 <th>AKSI</th>
             </tr>
         </thead>
@@ -357,18 +356,16 @@
                     <td class="td-num">{{ $index + 1 }}</td>
                     <td class="td-nama">{{ $area->nama_area }}</td>
                     <td class="td-alamat">{{ $area->lokasi ?? '-' }}</td>
-                    <td class="td-angka">{{ $area->kapasitas_mobil }}</td>
-                    <td class="td-angka">{{ $area->kapasitas_motor }}</td>
-                    <td class="td-angka">{{ $area->kapasitas_bus }}</td>
+                    <td class="td-angka">{{ $area->kapasitas }}</td>
+                    <td class="td-angka">{{ $area->terisi }}</td>
                     <td>
                         <a href="#"
                            class="aksi-edit"
                            data-id="{{ $area->id }}"
                            data-nama="{{ $area->nama_area }}"
                            data-lokasi="{{ $area->lokasi }}"
-                           data-mobil="{{ $area->kapasitas_mobil }}"
-                           data-motor="{{ $area->kapasitas_motor }}"
-                           data-bus="{{ $area->kapasitas_bus }}"
+                           data-kapasitas="{{ $area->kapasitas }}"
+                           data-terisi="{{ $area->terisi }}"
                            data-status="{{ $area->status }}"
                            onclick="editAreaFromLink(this); return false;">
                             Edit
@@ -398,7 +395,6 @@
                         <td class="td-alamat">{{ $row['alamat'] }}</td>
                         <td class="td-angka">{{ $row['kapasitas'] }}</td>
                         <td class="td-angka">{{ $row['terisi'] }}</td>
-                        <td><span class="pill-avail {{ $kelas }}">{{ $tersedia }}</span></td>
                         <td>
                             <a href="#" class="aksi-edit" onclick="bukaEdit(this); return false;">Edit</a>
                             <button type="button" class="aksi-delete">Delete</button>
@@ -429,17 +425,13 @@
             </div>
             <div class="modal-row">
                 <div class="modal-field">
-                    <label>KAPASITAS MOBIL</label>
-                    <input type="number" name="kapasitas_mobil" id="inputMobil" placeholder="0" min="0" required>
+                    <label>KAPASITAS</label>
+                    <input type="number" name="kapasitas" id="inputKapasitas" placeholder="0" min="0" required>
                 </div>
                 <div class="modal-field">
-                    <label>KAPASITAS MOTOR</label>
-                    <input type="number" name="kapasitas_motor" id="inputMotor" placeholder="0" min="0" required>
+                    <label>TERISI</label>
+                    <input type="number" name="terisi" id="inputTerisi" placeholder="0" min="0" required>
                 </div>
-            </div>
-            <div class="modal-field">
-                <label>KAPASITAS BUS</label>
-                <input type="number" name="kapasitas_bus" id="inputBus" placeholder="0" min="0" required>
             </div>
             <div class="modal-field">
                 <label>STATUS</label>
@@ -467,22 +459,21 @@
         document.getElementById('modalArea').classList.add('active');
     }
 
-    function editArea(id, nama, lokasi, mobil, motor, bus, status) {
+    function editArea(id, nama, lokasi, kapasitas, terisi, status) {
         document.getElementById('modalTitle').textContent = 'Edit Area';
         document.getElementById('areaForm').action = '{{ route("admin.area-parkir.update", ":id") }}'.replace(':id', id);
         document.getElementById('formMethod').value = 'PUT';
         document.getElementById('inputNama').value = nama;
         document.getElementById('inputAlamat').value = lokasi;
-        document.getElementById('inputMobil').value = mobil;
-        document.getElementById('inputMotor').value = motor;
-        document.getElementById('inputBus').value = bus;
+        document.getElementById('inputKapasitas').value = kapasitas;
+        document.getElementById('inputTerisi').value = terisi;
         document.getElementById('inputStatus').value = status;
         document.getElementById('modalArea').classList.add('active');
     }
 
     function editAreaFromLink(link) {
         const data = link.dataset;
-        editArea(data.id, data.nama, data.lokasi, data.mobil, data.motor, data.bus, data.status);
+        editArea(data.id, data.nama, data.lokasi, data.kapasitas, data.terisi, data.status);
     }
 
     function hapusAreaFromLink(button) {

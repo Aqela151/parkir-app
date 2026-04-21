@@ -102,8 +102,28 @@
     }
 
     @media print {
-        body { background: #fff; }
-        .btn-print { display: none; }
+        body * {
+            visibility: hidden;
+        }
+
+        .struk-container,
+        .struk-container * {
+            visibility: visible;
+        }
+
+        .struk-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            margin: 0;
+            box-shadow: none;
+            border-radius: 0;
+        }
+
+        .btn-print {
+            display: none;
+        }
     }
 </style>
 

@@ -19,33 +19,29 @@ class AreaParkirSeeder extends Seeder
             [
                 'nama_area' => 'Mall Olympic Garden (MOG)',
                 'lokasi' => 'Jl. Kawi No.24, Klojen',
-                'kapasitas_mobil' => 200,
-                'kapasitas_motor' => 300,
-                'kapasitas_bus' => 50,
+                'kapasitas' => 550, // 200+300+50
+                'terisi' => 0,
                 'status' => 'aktif',
             ],
             [
                 'nama_area' => 'Malang Town Square',
                 'lokasi' => 'Jl. Veteran No.2, Lowokwaru',
-                'kapasitas_mobil' => 250,
-                'kapasitas_motor' => 350,
-                'kapasitas_bus' => 60,
+                'kapasitas' => 660, // 250+350+60
+                'terisi' => 0,
                 'status' => 'aktif',
             ],
             [
                 'nama_area' => 'Malang Plaza',
                 'lokasi' => 'Jl. KH Agus Salim 18, Sukoharjo',
-                'kapasitas_mobil' => 180,
-                'kapasitas_motor' => 220,
-                'kapasitas_bus' => 40,
+                'kapasitas' => 440, // 180+220+40
+                'terisi' => 0,
                 'status' => 'aktif',
             ],
             [
                 'nama_area' => 'Alun-alun Merdeka Malang',
                 'lokasi' => 'Jl. Merdeka Selatan, Klojen',
-                'kapasitas_mobil' => 150,
-                'kapasitas_motor' => 150,
-                'kapasitas_bus' => 30,
+                'kapasitas' => 330, // 150+150+30
+                'terisi' => 0,
                 'status' => 'aktif',
             ],
         ];

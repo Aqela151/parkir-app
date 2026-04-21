@@ -295,20 +295,18 @@
 <div class="card">
     {{-- FILTERS --}}
     <div class="filters">
-        <div class="filter-search">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input
-                type="text"
-                name="search"
-                placeholder="Cari plat..."
-                value="{{ request('search') }}"
-                oninput="this.form && this.form.submit()"
-                form="filter-form"
-            >
-        </div>
-
-        <form id="filter-form" method="GET" action="{{ route('petugas.riwayat-transaksi') }}" style="display:contents;">
-            <input type="hidden" name="search" value="{{ request('search') }}">
+        <form id="filter-form" method="GET" action="{{ route('petugas.riwayat-transaksi') }}" style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; width:100%;">
+            <div class="filter-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Cari plat..."
+                    value="{{ request('search') }}"
+                    oninput="this.form.submit()"
+                    autocomplete="off"
+                >
+            </div>
 
             <div class="select-wrapper">
                 <select name="status" onchange="this.form.submit()">

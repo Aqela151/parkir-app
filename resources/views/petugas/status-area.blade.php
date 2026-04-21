@@ -153,7 +153,7 @@
 
 {{-- HEADING --}}
 <h1 class="page-heading">Status Area</h1>
-<p class="page-subtitle">Status Kapasitas real-time–Kota Malang</p>
+<p class="page-subtitle">Status Real-time Hari Ini</p>
 
 {{-- GRID --}}
 <div class="area-grid">
@@ -205,3 +205,89 @@
 </div>
 
 @endsection
+
+<script>
+(function() {
+    'use strict';
+
+    const API_URL = '{{ route("petugas.api.status-area") }}';
+    const UPDATE_INTERVAL = 10000; // 10 detik
+
+    // Inisialisasi saat DOM siap
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update initial status
+        updateStatusArea();
+        // Set interval untuk update berkala
+        setInterval(updateStatusArea, UPDATE_INTERVAL);
+    });
+
+    /**
+     * Update status area dari API
+     */
+    function updateStatusArea() {
+        fetch(API_URL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateCardDisplay(data);
+            })
+            .catch(error => {
+                console.error('Error updating status area:', error);
+            });
+    }
+
+    /**
+     * Update display area cards berdasarkan data API
+     */
+    function updateCardDisplay(data) {
+        const areaCards = document.querySelectorAll('.area-card');
+
+        data.forEach((area, index) => {
+            if (areaCards[index]) {
+                const card = areaCards[index];
+                const pct = area.kapasitas > 0 
+                    ? Math.round((area.terisi / area.kapasitas) * 100) 
+                    : 0;
+
+                let barClass = 'bar-grey';
+                let badgeType = 'toggle';
+
+                if (pct >= 75) {
+                    barClass = 'bar-dark';
+                    badgeType = 'dark';
+                } else if (pct > 0) {
+                    barClass = 'bar-gold';
+                    badgeType = 'yellow';
+                }
+
+                // Update badge
+                const badge = card.querySelector('.pct-badge');
+                if (badge) {
+                    badge.className = `pct-badge ${badgeType}`;
+                    badge.textContent = `${pct}%`;
+                }
+
+                // Update progress bar
+                const progressBar = card.querySelector('.progress-bar');
+                if (progressBar) {
+                    progressBar.className = `progress-bar ${barClass}`;
+                    progressBar.style.width = `${pct}%`;
+                }
+
+                // Update stats
+                const statLbls = card.querySelectorAll('.stat-lbl');
+                if (statLbls.length >= 3) {
+                    statLbls[0].textContent = `${area.terisi} terisi`;
+                    statLbls[1].textContent = `${area.kapasitas - area.terisi} tersedia`;
+                    statLbls[2].textContent = `${area.kapasitas} total`;
+                }
+            }
+        });
+    }
+
+})();
+</script>

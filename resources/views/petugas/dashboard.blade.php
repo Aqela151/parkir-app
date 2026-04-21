@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Dashboard Petugas')
-@section('page-title', 'Dashboard Petugas:Overview')
+@section('page-title', 'Dashboard Petugas:')
 
 @section('sidebar')
     @include('components.sidebar.petugas')
@@ -242,7 +242,6 @@
 {{-- GREETING --}}
 <div class="greeting">
     <h1>Selamat Bertugas, {{ auth()->user()->name ?? 'Petugas' }}</h1>
-    <p>Lokasi: {{ $lokasiShift ?? 'Belum ada shift aktif' }}</p>
 </div>
 
 {{-- STATS --}}
@@ -333,7 +332,7 @@
 
 {{-- STATUS AREA --}}
 <div class="section-title">Status Area</div>
-<div class="section-sub">{{ $namaArea ?? 'Area' }}-Terbaru Hari ini</div>
+<div class="section-sub">Status Real-time Hari Ini</div>
 <div class="status-area-card">
     @forelse ($statusArea as $area)
         @php
@@ -376,3 +375,87 @@
 </div>
 
 @endsection
+
+<script>
+(function() {
+    'use strict';
+
+    const API_URL = '{{ route("petugas.api.status-area") }}';
+    const UPDATE_INTERVAL = 10000; // 10 detik
+
+    // Inisialisasi saat DOM siap
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update initial status
+        updateStatusArea();
+        // Set interval untuk update berkala
+        setInterval(updateStatusArea, UPDATE_INTERVAL);
+    });
+
+    /**
+     * Update status area dari API
+     */
+    function updateStatusArea() {
+        fetch(API_URL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateAreaDisplay(data);
+            })
+            .catch(error => {
+                console.error('Error updating status area:', error);
+            });
+    }
+
+    /**
+     * Update display area items berdasarkan data API
+     */
+    function updateAreaDisplay(data) {
+        const areaItems = document.querySelectorAll('.status-area-card .area-item');
+
+        data.forEach((area, index) => {
+            if (areaItems[index]) {
+                const item = areaItems[index];
+                const pct = area.kapasitas > 0 
+                    ? Math.round((area.terisi / area.kapasitas) * 100) 
+                    : 0;
+
+                let barClass = 'grey';
+                let badgeClass = 'yellow';
+
+                if (pct >= 90) {
+                    barClass = 'dark';
+                    badgeClass = 'dark';
+                } else if (pct >= 50) {
+                    barClass = 'yellow';
+                    badgeClass = 'yellow';
+                }
+
+                // Update badge
+                const badge = item.querySelector('.area-pct-badge');
+                if (badge) {
+                    badge.className = `area-pct-badge ${badgeClass}`;
+                    badge.textContent = `${pct}%`;
+                }
+
+                // Update progress bar
+                const barFill = item.querySelector('.area-bar-fill');
+                if (barFill) {
+                    barFill.className = `area-bar-fill ${barClass}`;
+                    barFill.style.width = `${pct}%`;
+                }
+
+                // Update slot text
+                const slot = item.querySelector('.area-slot');
+                if (slot) {
+                    slot.textContent = `${area.terisi}/${area.kapasitas} slot`;
+                }
+            }
+        });
+    }
+
+})();
+</script>

@@ -23,11 +23,15 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard', [
-            'kendaraanCount' => Kendaraan::count(),
-            'areaCount' => AreaParkir::where('status', 'aktif')->count(),
-            'tarifCount' => TarifParkir::count(),
-            'userCount' => User::count(),
-            'areaCards' => AreaParkir::take(4)->get(),
+            'kendaraanCount' => \App\Models\Kendaraan::count(),
+            'areaCount' => \App\Models\AreaParkir::where('status', 'aktif')->count(),
+            'tarifCount' => \App\Models\TarifParkir::count(),
+            'userCount' => \App\Models\User::count(),
+            'areaCards' => \App\Models\AreaParkir::where('status', 'aktif')->take(4)->get()->map(function ($area) {
+                $terisi = \App\Models\Transaksi::where('area_id', $area->id)->where('status', 'parkir')->count();
+                $area->terisi = $terisi;
+                return $area;
+            }),
         ]);
     })->name('dashboard');
 
@@ -56,6 +60,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::delete('/area-parkir/{id}',      [AreaParkirController::class, 'destroy'])->name('area-parkir.destroy');
 
     Route::get('/log-aktivitas', [\App\Http\Controllers\AdminController::class, 'logAktivitas'])->name('log-aktivitas');
+    Route::get('/api/status-area', function () {
+        return \App\Models\AreaParkir::where('status', 'aktif')->get()->map(function ($area) {
+            $terisi = \App\Models\Transaksi::where('area_id', $area->id)->where('status', 'parkir')->count();
+            return [
+                'nama' => $area->nama_area,
+                'alamat' => $area->lokasi,
+                'kapasitas' => $area->kapasitas,
+                'terisi' => $terisi,
+            ];
+        });
+    })->name('api.status-area');
 });
 
 // PETUGAS
@@ -73,6 +88,7 @@ Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])
     Route::get('/riwayat-transaksi', [\App\Http\Controllers\PetugasTransaksiController::class, 'riwayat'])->name('riwayat-transaksi');
     Route::get('/riwayat-transaksi/{id}/struk', [\App\Http\Controllers\PetugasTransaksiController::class, 'struk'])->name('riwayat-transaksi.struk');
     Route::get('/status-area', [\App\Http\Controllers\PetugasDashboardController::class, 'statusArea'])->name('status-area');
+    Route::get('/api/status-area', [\App\Http\Controllers\PetugasDashboardController::class, 'getStatusArea'])->name('api.status-area');
 });
 
 // OWNER
@@ -80,5 +96,5 @@ Route::prefix('owner')->name('owner.')->middleware(['auth', 'role:owner'])->grou
     Route::get('/dashboard', fn() => view('owner.dashboard'))->name('dashboard');
     Route::get('/rekap-transaksi', [\App\Http\Controllers\OwnerController::class, 'rekapTransaksi'])->name('rekap-transaksi');
     Route::get('/grafik-pendapatan', [\App\Http\Controllers\OwnerController::class, 'grafikPendapatan'])->name('grafik-pendapatan');
-    Route::get('/performa-area', fn() => view('owner.performa-area'))->name('performa-area');
+    Route::get('/performa-area', [\App\Http\Controllers\OwnerController::class, 'performaArea'])->name('performa-area');
 });

@@ -401,39 +401,22 @@
                 @enderror
             </div>
 
-            <div class="form-row">
-                {{-- Dropdown Area --}}
-                <div>
-                    <label class="form-label">Area Parkir</label>
-                    <div class="select-wrapper">
-                        <select name="area_id" class="form-select" required>
-                            <option value="" disabled selected>-- Pilih Area --</option>
-                            @foreach ($areaList as $area)
-                                <option value="{{ $area->id }}" {{ old('area_id') == $area->id ? 'selected' : '' }}>
-                                    {{ $area->nama_area }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    @error('area_id')
-                        <div style="color:#e05a5a; font-size:11px; margin-top:4px;">{{ $message }}</div>
-                    @enderror
+            {{-- Dropdown Area --}}
+            <div class="form-group">
+                <label class="form-label">Area Parkir</label>
+                <div class="select-wrapper">
+                    <select name="area_id" class="form-select" required>
+                        <option value="" disabled selected>-- Pilih Area --</option>
+                        @foreach ($areaList as $area)
+                            <option value="{{ $area->id }}" {{ old('area_id') == $area->id ? 'selected' : '' }}>
+                                {{ $area->nama_area }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-
-                {{-- Waktu Masuk --}}
-                <div>
-                    <label class="form-label">Waktu Masuk</label>
-                    <input
-                        type="time"
-                        name="waktu_masuk"
-                        class="form-input"
-                        value="{{ old('waktu_masuk', now()->format('H:i')) }}"
-                        required
-                    >
-                    @error('waktu_masuk')
-                        <div style="color:#e05a5a; font-size:11px; margin-top:4px;">{{ $message }}</div>
-                    @enderror
-                </div>
+                @error('area_id')
+                    <div style="color:#e05a5a; font-size:11px; margin-top:4px;">{{ $message }}</div>
+                @enderror
             </div>
 
             <button type="submit" class="btn-catat">
@@ -533,87 +516,157 @@
     </table>
 </div>
 
-{{-- SCRIPT: search plat + filter tabel --}}
+{{-- SCRIPT: Search dan Filter --}}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+(function() {
+    'use strict';
 
-    // ===== SEARCH KENDARAAN (card kanan) =====
-    const kendaraanData = @json($kendaraanList->map(function($k) {
-        return [
+    // Inisialisasi saat DOM siap
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSearch();
+        initializeFilter();
+    });
+
+    /**
+     * Inisialisasi fitur pencarian kendaraan
+     */
+    function initializeSearch() {
+        const kendaraanData = @json($kendaraanList->map(fn($k) => [
             'id' => $k->id,
             'plat' => $k->plat_nomor,
             'jenis' => ucfirst($k->jenis)
-        ];
-    }));
+        ]));
 
-    const searchInput = document.getElementById('searchPlat');
-    const resultBox = document.getElementById('searchResultBox');
-    const selectKendaraan = document.querySelector('select[name="kendaraan_id"]');
+        const searchInput = document.getElementById('searchPlat');
+        const resultBox = document.getElementById('searchResultBox');
+        const selectKendaraan = document.querySelector('select[name="kendaraan_id"]');
 
-    searchInput.addEventListener('input', function () {
-        const q = this.value.toLowerCase().trim();
-        resultBox.innerHTML = '';
-        resultBox.style.display = 'none';
-        if (q.length < 1) return;
-
-        const matches = kendaraanData.filter(k => k.plat.toLowerCase().includes(q));
-        if (matches.length === 0) {
-            resultBox.innerHTML = '<div class="search-result-item" style="color:#bbb;">Tidak ditemukan.</div>';
-            resultBox.style.display = 'block';
+        if (!searchInput || !resultBox || !selectKendaraan) {
+            console.error('Search elements not found');
             return;
         }
 
-        matches.forEach(function (k) {
-            const el = document.createElement('div');
-            el.className = 'search-result-item';
-            el.innerHTML = '<div class="plat">' + k.plat + '</div><div class="detail">' + k.jenis + '</div>';
-            el.addEventListener('click', function () {
-                // set dropdown di form
-                selectKendaraan.value = k.id;
-                searchInput.value = k.plat;
-                resultBox.style.display = 'none';
-            });
-            resultBox.appendChild(el);
-        });
-        resultBox.style.display = 'block';
-    });
-
-    document.addEventListener('click', function (e) {
-        if (!searchInput.contains(e.target) && !resultBox.contains(e.target)) {
+        // Event: Input search
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            resultBox.innerHTML = '';
             resultBox.style.display = 'none';
-        }
-    });
 
-    // ===== FILTER TABEL BAWAH =====
-    const filterPlat = document.getElementById('filterPlat');
-    const filterSort = document.getElementById('filterSort');
-    const tbody      = document.getElementById('parkirTableBody');
+            if (query.length < 1) {
+                return;
+            }
 
-    function applyFilter() {
-        const q    = filterPlat.value.toLowerCase().trim();
-        const sort = filterSort.value;
-        let rows   = Array.from(tbody.querySelectorAll('tr[data-plat]'));
+            const matches = kendaraanData.filter(k => 
+                k.plat.toLowerCase().includes(query)
+            );
 
-        // filter plat
-        rows.forEach(function (r) {
-            const plat = r.dataset.plat || '';
-            r.style.display = plat.includes(q) ? '' : 'none';
+            if (matches.length === 0) {
+                resultBox.innerHTML = '<div class="search-result-item" style="color:#bbb;">Tidak ditemukan.</div>';
+                resultBox.style.display = 'block';
+                return;
+            }
+
+            matches.forEach(function(k) {
+                const element = document.createElement('div');
+                element.className = 'search-result-item';
+                element.innerHTML = '<div class="plat">' + escapeHtml(k.plat) + '</div><div class="detail">' + escapeHtml(k.jenis) + '</div>';
+                
+                element.addEventListener('click', function() {
+                    selectKendaraan.value = k.id;
+                    searchInput.value = k.plat;
+                    resultBox.style.display = 'none';
+                });
+
+                resultBox.appendChild(element);
+            });
+
+            resultBox.style.display = 'block';
         });
 
-        // sort
-        const visible = rows.filter(r => r.style.display !== 'none');
-        visible.sort(function (a, b) {
-            if (sort === 'masuk_asc')  return new Date(a.dataset.masuk) - new Date(b.dataset.masuk);
-            if (sort === 'masuk_desc') return new Date(b.dataset.masuk) - new Date(a.dataset.masuk);
-            if (sort === 'plat_asc')   return a.dataset.plat.localeCompare(b.dataset.plat);
-            return 0;
+        // Event: Klik di luar untuk tutup hasil
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !resultBox.contains(e.target)) {
+                resultBox.style.display = 'none';
+            }
         });
-        visible.forEach(r => tbody.appendChild(r));
     }
 
-    filterPlat.addEventListener('input', applyFilter);
-    filterSort.addEventListener('change', applyFilter);
-});
+    /**
+     * Inisialisasi fitur filter dan sort tabel
+     */
+    function initializeFilter() {
+        const filterPlat = document.getElementById('filterPlat');
+        const filterSort = document.getElementById('filterSort');
+        const tbody = document.getElementById('parkirTableBody');
+
+        if (!filterPlat || !filterSort || !tbody) {
+            console.error('Filter elements not found');
+            return;
+        }
+
+        // Event: Filter plat
+        filterPlat.addEventListener('input', applyFilter);
+
+        // Event: Sort
+        filterSort.addEventListener('change', applyFilter);
+
+        /**
+         * Terapkan filter dan sort ke tabel
+         */
+        function applyFilter() {
+            const query = filterPlat.value.toLowerCase().trim();
+            const sortBy = filterSort.value;
+
+            // Ambil semua rows
+            let rows = Array.from(tbody.querySelectorAll('tr[data-plat]'));
+
+            // Filter berdasarkan plat
+            rows.forEach(function(row) {
+                const plat = row.dataset.plat || '';
+                row.style.display = plat.includes(query) ? '' : 'none';
+            });
+
+            // Sort rows yang terlihat
+            const visibleRows = rows.filter(r => r.style.display !== 'none');
+
+            visibleRows.sort(function(a, b) {
+                const aMasuk = new Date(a.dataset.masuk);
+                const bMasuk = new Date(b.dataset.masuk);
+                const aPlat = a.dataset.plat;
+                const bPlat = b.dataset.plat;
+
+                switch(sortBy) {
+                    case 'masuk_asc':
+                        return aMasuk - bMasuk;
+                    case 'masuk_desc':
+                        return bMasuk - aMasuk;
+                    case 'plat_asc':
+                        return aPlat.localeCompare(bPlat);
+                    default:
+                        return 0;
+                }
+            });
+
+            // Re-insert sorted rows
+            visibleRows.forEach(row => tbody.appendChild(row));
+        }
+    }
+
+    /**
+     * Helper: Escape HTML untuk prevent XSS
+     */
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+})();
 </script>
 
 @endsection

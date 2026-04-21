@@ -65,19 +65,16 @@ class PetugasTransaksiController extends Controller
         $validated = $request->validate([
             'kendaraan_id' => 'required|exists:kendaraans,id',
             'area_id' => 'required|exists:area_parkirs,id',
-            'waktu_masuk' => 'required|date_format:H:i',
         ]);
 
         try {
             $kendaraan = Kendaraan::findOrFail($validated['kendaraan_id']);
             $area = AreaParkir::findOrFail($validated['area_id']);
 
-            $waktuMasuk = Carbon::createFromFormat('H:i', $validated['waktu_masuk'], Auth::user()->timezone ?? 'Asia/Jakarta');
-
             Transaksi::create([
                 'kendaraan_id' => $validated['kendaraan_id'],
                 'area_id' => $validated['area_id'],
-                'waktu_masuk' => $waktuMasuk,
+                'waktu_masuk' => Carbon::now('Asia/Jakarta'),
                 'status' => 'parkir',
                 'tarif_sementara' => 0,
             ]);
@@ -103,10 +100,9 @@ class PetugasTransaksiController extends Controller
                     ->with('error', 'Transaksi ini sudah selesai.');
             }
 
-            $waktuKeluar = Carbon::now();
+            $waktuKeluar = Carbon::now('Asia/Jakarta');
             $durasiMenit = $transaksi->waktu_masuk->diffInMinutes($waktuKeluar);
 
-            // Hitung tarif (simple: 5000 per jam, minimum 5000)
             $tarifAkhir = max(5000, ceil($durasiMenit / 60) * 5000);
 
             $transaksi->update([

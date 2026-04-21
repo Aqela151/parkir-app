@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Dashboard Admin')
-@section('page-title', 'Dashboard Admin:Overview')
+@section('page-title', 'Dashboard Admin')
 
 @section('content')
 
@@ -248,7 +248,9 @@
         <div class="area-card">
             @forelse ($areaCards as $area)
                 @php
-                    $totalCapacity = $area->kapasitas_mobil + $area->kapasitas_motor + $area->kapasitas_bus;
+                    $totalCapacity = $area->kapasitas;
+                    $terisi = $area->terisi ?? 0;
+                    $persen = $totalCapacity > 0 ? ($terisi / $totalCapacity) * 100 : 0;
                     $badgeClass = $area->status === 'aktif' ? 'dark' : 'yellow';
                 @endphp
                 <div class="area-item">
@@ -262,11 +264,11 @@
                     @if ($area->status === 'penuh')
                         <div class="area-bar-bg"><div class="area-bar-fill yellow" style="width: 100%"></div></div>
                     @elseif ($area->status === 'aktif')
-                        <div class="area-bar-bg"><div class="area-bar-fill" style="width: 80%"></div></div>
+                        <div class="area-bar-bg"><div class="area-bar-fill" style="width: {{ $persen }}%"></div></div>
                     @else
-                        <div class="area-bar-bg"><div class="area-bar-fill yellow" style="width: 60%"></div></div>
+                        <div class="area-bar-bg"><div class="area-bar-fill yellow" style="width: {{ $persen }}%"></div></div>
                     @endif
-                    <div class="area-slot">Total kapasitas {{ $totalCapacity }} slot</div>
+                    <div class="area-slot">Terisi {{ $terisi }} / {{ $totalCapacity }} slot</div>
                 </div>
             @empty
                 <div class="area-item">
@@ -313,3 +315,44 @@
 </div>
 
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateAreaStatus() {
+        fetch('{{ route("admin.api.status-area") }}')
+            .then(response => response.json())
+            .then(data => {
+                const areaItems = document.querySelectorAll('.area-card .area-item');
+                data.forEach((area, index) => {
+                    if (areaItems[index]) {
+                        const item = areaItems[index];
+                        const pct = area.kapasitas > 0 ? Math.round((area.terisi / area.kapasitas) * 100) : 0;
+                        
+                        // Update badge (assuming status is aktif)
+                        const badge = item.querySelector('.area-pct-badge');
+                        if (badge) {
+                            badge.className = `area-pct-badge dark`; // Assuming aktif
+                            badge.textContent = 'Aktif';
+                        }
+                        
+                        // Update progress bar
+                        const barFill = item.querySelector('.area-bar-fill');
+                        if (barFill) {
+                            barFill.style.width = `${pct}%`;
+                        }
+                        
+                        // Update slot text
+                        const slot = item.querySelector('.area-slot');
+                        if (slot) {
+                            slot.textContent = `Terisi ${area.terisi} / ${area.kapasitas} slot`;
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error updating area status:', error));
+    }
+    
+    // Update every 10 seconds
+    setInterval(updateAreaStatus, 10000);
+});
+</script>

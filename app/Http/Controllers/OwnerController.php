@@ -221,4 +221,54 @@ class OwnerController extends Controller
             'pendapatanPerArea'
         ));
     }
+
+    public function performaArea()
+    {
+        try {
+            $performaArea = AreaParkir::where('status', 'aktif')
+                ->get()
+                ->map(function ($area) {
+                    $kapasitas = (int)($area->kapasitas ?? 0);
+                    
+                    $terisi = (int) Transaksi::where('area_id', $area->id)
+                        ->where('status', 'parkir')
+                        ->count();
+
+                    $txBulanIni = (int) Transaksi::where('area_id', $area->id)
+                        ->whereMonth('waktu_masuk', date('m'))
+                        ->whereYear('waktu_masuk', date('Y'))
+                        ->count();
+
+                    $pendapatan = (float)(Transaksi::where('area_id', $area->id)
+                        ->whereMonth('waktu_masuk', date('m'))
+                        ->whereYear('waktu_masuk', date('Y'))
+                        ->whereNotNull('tarif_akhir')
+                        ->sum('tarif_akhir') ?? 0);
+
+                    $rataDurasi = (int) round(
+                        Transaksi::where('area_id', $area->id)
+                            ->whereMonth('waktu_masuk', date('m'))
+                            ->whereYear('waktu_masuk', date('Y'))
+                            ->avg('durasi_menit') ?? 0
+                    );
+
+                    return [
+                        'nama' => $area->nama_area ?? 'Area',
+                        'alamat' => $area->lokasi ?? 'Lokasi belum diisi',
+                        'kapasitas' => $kapasitas,
+                        'terisi' => $terisi,
+                        'tx_bulan_ini' => $txBulanIni,
+                        'pendapatan' => $pendapatan,
+                        'rata_durasi' => $rataDurasi,
+                    ];
+                })
+                ->values()
+                ->toArray();
+
+            return view('owner.performa-area', ['performaArea' => $performaArea]);
+        } catch (\Exception $e) {
+            \Log::error('Error in performaArea: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+            return view('owner.performa-area', ['performaArea' => []]);
+        }
+    }
 }
