@@ -88,7 +88,7 @@ class PetugasTransaksiController extends Controller
     }
 
     /**
-     * Mark kendaraan keluar (exit)
+     * Mark kendaraan keluar (exit) dan langsung tampilkan struk dengan auto-print
      */
     public function keluar($id)
     {
@@ -112,8 +112,7 @@ class PetugasTransaksiController extends Controller
                 'status' => 'selesai',
             ]);
 
-            return redirect()->route('petugas.transaksi.index')
-                ->with('success', "Kendaraan {$transaksi->kendaraan->plat_nomor} berhasil keluar.");
+            return redirect()->route('petugas.transaksi.struk', ['id' => $id, 'autoprint' => '1']);
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Gagal memproses keluar: ' . $e->getMessage());

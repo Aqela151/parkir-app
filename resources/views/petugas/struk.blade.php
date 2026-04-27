@@ -11,41 +11,44 @@
 
 <style>
     .struk-container {
-        max-width: 500px;
-        margin: 40px auto;
+        max-width: 220px;
+        margin: 20px auto;
         background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        padding: 32px;
+        border: 1px dashed #ccc;
+        border-radius: 4px;
+        padding: 10px;
         font-family: 'Courier New', monospace;
+        font-size: 10px;
+        color: #1a1a1a;
     }
 
     .struk-header {
         text-align: center;
-        margin-bottom: 24px;
-        border-bottom: 1px dashed #ddd;
-        padding-bottom: 16px;
+        border-bottom: 1px dashed #ccc;
+        padding-bottom: 6px;
+        margin-bottom: 6px;
     }
 
     .struk-header h2 {
-        font-size: 18px;
+        font-size: 12px;
         font-weight: 700;
         margin: 0;
+        letter-spacing: 1px;
         color: #1a1a1a;
     }
 
     .struk-header p {
-        font-size: 12px;
+        font-size: 9px;
         color: #aaa;
-        margin: 4px 0 0 0;
+        margin: 2px 0 0 0;
     }
 
     .struk-row {
         display: flex;
         justify-content: space-between;
-        font-size: 13px;
-        margin-bottom: 8px;
-        line-height: 1.5;
+        font-size: 10px;
+        margin-bottom: 3px;
+        line-height: 1.4;
     }
 
     .struk-label {
@@ -55,45 +58,46 @@
     .struk-value {
         color: #1a1a1a;
         font-weight: 600;
+        text-align: right;
     }
 
     .struk-section {
-        margin-top: 16px;
-        padding-top: 12px;
-        border-top: 1px dashed #ddd;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px dashed #ccc;
     }
 
     .struk-total {
         display: flex;
         justify-content: space-between;
-        font-size: 16px;
+        font-size: 11px;
         font-weight: 700;
-        margin-top: 16px;
-        padding-top: 12px;
+        margin-top: 5px;
+        padding-top: 5px;
         border-top: 1px solid #F8C61E;
         color: #1a1a1a;
     }
 
     .struk-footer {
         text-align: center;
-        margin-top: 24px;
-        padding-top: 12px;
-        border-top: 1px dashed #ddd;
-        font-size: 11px;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px dashed #ccc;
+        font-size: 8px;
         color: #aaa;
     }
 
     .btn-print {
         width: 100%;
-        padding: 12px;
+        padding: 6px;
         background: #F8C61E;
         color: #1a1a1a;
         border: none;
-        border-radius: 10px;
+        border-radius: 6px;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 11px;
         cursor: pointer;
-        margin-top: 24px;
+        margin-top: 10px;
         transition: background 0.2s;
     }
 
@@ -115,7 +119,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
+            width: 220px;
             margin: 0;
             box-shadow: none;
             border-radius: 0;
@@ -134,34 +138,34 @@
     </div>
 
     <div class="struk-row">
-        <span class="struk-label">Plat Nomor:</span>
+        <span class="struk-label">Plat</span>
         <span class="struk-value">{{ $transaksi->kendaraan->plat_nomor ?? '-' }}</span>
     </div>
 
     <div class="struk-row">
-        <span class="struk-label">Jenis Kendaraan:</span>
+        <span class="struk-label">Kendaraan</span>
         <span class="struk-value">{{ ucfirst($transaksi->kendaraan->jenis ?? '-') }}</span>
     </div>
 
     <div class="struk-row">
-        <span class="struk-label">Area Parkir:</span>
+        <span class="struk-label">Area</span>
         <span class="struk-value">{{ $transaksi->area->nama_area ?? '-' }}</span>
     </div>
 
     <div class="struk-section">
         <div class="struk-row">
-            <span class="struk-label">Waktu Masuk:</span>
+            <span class="struk-label">Masuk</span>
             <span class="struk-value">{{ $transaksi->waktu_masuk->format('H:i:s') }}</span>
         </div>
 
         @if ($transaksi->waktu_keluar)
             <div class="struk-row">
-                <span class="struk-label">Waktu Keluar:</span>
+                <span class="struk-label">Keluar</span>
                 <span class="struk-value">{{ $transaksi->waktu_keluar->format('H:i:s') }}</span>
             </div>
 
             <div class="struk-row">
-                <span class="struk-label">Durasi:</span>
+                <span class="struk-label">Durasi</span>
                 <span class="struk-value">{{ $transaksi->durasi_menit ?? 0 }} menit</span>
             </div>
         @endif
@@ -169,18 +173,29 @@
 
     @if ($transaksi->tarif_akhir)
         <div class="struk-total">
-            <span>TOTAL TARIF:</span>
+            <span>TOTAL</span>
             <span>Rp {{ number_format($transaksi->tarif_akhir, 0, ',', '.') }}</span>
         </div>
     @endif
 
     <div class="struk-footer">
-        <p>Terima kasih telah menggunakan layanan parkir kami</p>
+        <p>Terima kasih atas kunjungan Anda</p>
     </div>
 </div>
 
-<button class="btn-print" onclick="window.print()">
-    🖨️ Cetak Struk
-</button>
+<script>
+    const autoPrint = "{{ request()->get('autoprint') }}";
+
+    if (autoPrint === '1') {
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.print();
+                setTimeout(function() {
+                    window.location.href = "{{ route('petugas.transaksi.index') }}";
+                }, 500);
+            }, 500);
+        });
+    }
+</script>
 
 @endsection

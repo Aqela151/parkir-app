@@ -102,6 +102,56 @@
 
     .btn-export:hover { background: #333; }
 
+    /* ===== EXPORT DROPDOWN ===== */
+    .export-dropdown {
+        position: relative;
+    }
+
+    .export-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 140px;
+        z-index: 100;
+        margin-top: 8px;
+    }
+
+    .export-menu.active {
+        display: block;
+    }
+
+    .export-menu a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        color: #1a1a1a;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        border: none;
+        background: none;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.2s;
+    }
+
+    .export-menu a:first-child {
+        border-radius: 12px 12px 0 0;
+    }
+
+    .export-menu a:last-child {
+        border-radius: 0 0 12px 12px;
+    }
+
+    .export-menu a:hover {
+        background: #f5f3ef;
+    }
+
     /* ===== SUMMARY CARDS ===== */
     .summary-grid {
         display: grid;
@@ -504,10 +554,11 @@
         </select>
     </form>
 
-    <a href="{{ route('owner.grafik-pendapatan', array_merge(request()->query(), ['export' => 'pdf'])) }}"
+    <a href="{{ route('owner.grafik-pendapatan', array_merge(request()->query(), ['export' => 'xlsx'])) }}"
        class="btn-export">
-        <i class="fa-solid fa-arrow-up-from-bracket"></i> Export
+        <i class="fa-solid fa-arrow-up-from-bracket"></i> Export Excel
     </a>
+
 </div>
 
 {{-- SUMMARY CARDS --}}
@@ -587,14 +638,23 @@
                         $bulanNow = (int)date('n') - 1;
                         $isHighlight = $i === $bulanNow;
                     @endphp
+
                     <div class="bar-group {{ $isHighlight ? 'highlight' : '' }}">
-                        <div class="bar motor" style="height: {{ max($motorH, 4) }}px">
-                            <div class="bar-tooltip">Motor: {{ $motorJt }}jt</div>
+                        <div class="bar motor" style="height: {{ max($motorH, 4) }}px;">
+                            <div class="bar-tooltip">
+                                Motor: {{ $motorJt }}jt
+                            </div>
                         </div>
-                        <div class="bar mobil" style="height: {{ max($mobilH, 4) }}px">
-                            <div class="bar-tooltip">Mobil: {{ $mobilJt }}jt</div>
+
+                        <div class="bar mobil" style="height: {{ max($mobilH, 4) }}px;">
+                            <div class="bar-tooltip">
+                                Mobil: {{ $mobilJt }}jt
+                            </div>
                         </div>
-                        <span class="bar-month-label">{{ $bulanLabels[$i] }}</span>
+
+                        <span class="bar-month-label">
+                            {{ $bulanLabels[$i] }}
+                        </span>
                     </div>
                 @endforeach
             </div>
@@ -663,7 +723,8 @@
             <div class="area-name">{{ $area['nama'] ?? 'Area' }}</div>
             <div class="area-bar-wrap">
                 <div class="area-bar-bg">
-                    <div class="area-bar-fill {{ $isFirst ? 'gold' : '' }}" style="width: {{ $barPct }}%"></div>
+                   <div class="area-bar-fill {{ $isFirst ? 'gold' : '' }}" 
+     style="--w: {{ $barPct }}%"></div>
                 </div>
             </div>
             <div class="area-value">{{ $area['totalFormatted'] ?? 'Rp 0' }}</div>

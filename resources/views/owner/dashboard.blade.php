@@ -151,7 +151,7 @@
     }
 
     .legend-dot.motor { background: #F8C61E; }
-    .legend-dot.mobil { background: #ccc; }
+    .legend-dot.mobil { background: #1C1C1E; }
 
     .chart-bars {
         display: flex;
@@ -170,14 +170,16 @@
         position: relative;
     }
 
+    /* FIX: height: var(--h) agar bar tampil sesuai data dari controller */
     .bar {
         flex: 1;
         border-radius: 4px 4px 0 0;
         min-height: 4px;
+        height: var(--h, 4px);
     }
 
     .bar.motor { background: #F8C61E; }
-    .bar.mobil { background: #ccc; }
+    .bar.mobil { background: #1C1C1E; }
 
     .bar-label {
         position: absolute;
@@ -259,8 +261,15 @@
         overflow: hidden;
     }
 
-    .area-bar-fill        { height: 100%; border-radius: 10px; background: #1C1C1E; }
-    .area-bar-fill.gold   { background: #F8C61E; }
+    /* FIX: width: var(--w) agar progress bar area tampil sesuai data */
+    .area-bar-fill {
+        height: 100%;
+        border-radius: 10px;
+        background: #1C1C1E;
+        width: var(--w, 0%);
+    }
+
+    .area-bar-fill.gold { background: #F8C61E; }
 
     /* ===== BOTTOM STATS ===== */
     .bottom-grid {
@@ -375,7 +384,6 @@
         <div class="chart-bars">
             @php
                 $days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-                // Gunakan data dari controller jika ada, fallback ke dummy
                 $chartData = $chartHarian ?? [
                     ['motor' => 40, 'mobil' => 55],
                     ['motor' => 45, 'mobil' => 60],
@@ -389,9 +397,13 @@
             @endphp
 
             @forelse ($chartData as $i => $day)
+                @php
+                    $motorHeight = ($day['motor'] ?? 0) / ($maxVal ?: 1) * 130;
+                    $mobilHeight = ($day['mobil'] ?? 0) / ($maxVal ?: 1) * 130;
+                @endphp
                 <div class="bar-group">
-                    <div class="bar motor" style="height: {{ round(($day['motor'] ?? 0) / $maxVal * 130) }}px"></div>
-                    <div class="bar mobil" style="height: {{ round(($day['mobil'] ?? 0) / $maxVal * 130) }}px"></div>
+                    <div class="bar motor" style="--h: {{ $motorHeight }}px"></div>
+                    <div class="bar mobil" style="--h: {{ $mobilHeight }}px"></div>
                     <span class="bar-label">{{ $days[$i] ?? '' }}</span>
                 </div>
             @empty
@@ -417,7 +429,7 @@
                     </div>
                     <div class="area-address">{{ $area['alamat'] ?? '-' }}</div>
                     <div class="area-bar-bg">
-                        <div class="area-bar-fill {{ $isFirst ? 'gold' : '' }}" style="width: {{ $barWidth }}%"></div>
+                        <div class="area-bar-fill {{ $isFirst ? 'gold' : '' }}" style="--w: {{ $barWidth }}%"></div>
                     </div>
                 </div>
             </div>

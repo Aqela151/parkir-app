@@ -93,7 +93,7 @@ Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])
 
 // OWNER
 Route::prefix('owner')->name('owner.')->middleware(['auth', 'role:owner'])->group(function () {
-    Route::get('/dashboard', fn() => view('owner.dashboard'))->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\OwnerController::class, 'dashboard'])->name('dashboard');
     Route::get('/rekap-transaksi', [\App\Http\Controllers\OwnerController::class, 'rekapTransaksi'])->name('rekap-transaksi');
     Route::get('/grafik-pendapatan', [\App\Http\Controllers\OwnerController::class, 'grafikPendapatan'])->name('grafik-pendapatan');
     Route::get('/performa-area', [\App\Http\Controllers\OwnerController::class, 'performaArea'])->name('performa-area');

@@ -183,8 +183,7 @@
 
             <div class="progress-wrap">
                 <div class="progress-bar {{ $barClass }}"
-                     style="width: {{ $pct !== null ? $pct : 0 }}%"></div>
-            </div>
+     style="--w: {{ $pct ?? 0 }}%"></div>
 
             <div class="stats-row">
                 @if ($pct !== null)

@@ -29,11 +29,12 @@
     }
 
     .greeting h1 {
-        font-size: 36px;
+        font-size: 40px;
         font-weight: 900;
         color: #1a1a1a;
-        letter-spacing: -1px;
-        margin-bottom: 6px;
+        letter-spacing: -1.5px;
+        margin-bottom: 4px;
+        line-height: 1.1;
     }
 
     .greeting p {
@@ -42,41 +43,246 @@
         margin-bottom: 28px;
     }
 
-    /* ===== TWO COL LAYOUT ===== */
     .top-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
         margin-bottom: 36px;
+        align-items: stretch;
     }
 
-    /* ===== FORM CARD ===== */
     .form-card, .search-card {
         background: #fff;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 18px;
     }
 
     .form-group {
-        margin-bottom: 14px;
+        margin-bottom: 18px;
     }
 
     .form-label {
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
-        color: #aaa;
-        letter-spacing: 0.5px;
-        margin-bottom: 6px;
+        color: #666;
+        letter-spacing: 0.6px;
+        margin-bottom: 8px;
         display: block;
+        text-transform: uppercase;
     }
 
-    .form-select, .form-input {
+    /* ── PLAT SEARCH INPUT ── */
+    .plat-search-wrapper {
+        position: relative;
+    }
+
+    .plat-search-input {
         width: 100%;
-        padding: 10px 14px;
+        padding: 14px 16px;
         border: 1.5px solid #e8e4dc;
         border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #1a1a1a;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+        font-family: inherit;
+        background: #fff;
+        text-transform: uppercase;
+    }
+
+    .plat-search-input:focus { border-color: #F8C61E; }
+    .plat-search-input::placeholder { font-weight: 400; letter-spacing: 0; text-transform: none; color: #bbb; }
+
+    .plat-dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0; right: 0;
+        background: #fff;
+        border: 1.5px solid #e8e4dc;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+        z-index: 100;
+        max-height: 220px;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .plat-dropdown::-webkit-scrollbar { width: 4px; }
+    .plat-dropdown::-webkit-scrollbar-track { background: #f5f3ef; border-radius: 4px; }
+    .plat-dropdown::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+    .plat-dropdown-item {
+        padding: 10px 14px;
+        cursor: pointer;
         font-size: 13px;
+        color: #444;
+        border-bottom: 1px solid #f5f3ef;
+        transition: background 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .plat-dropdown-item:last-child { border-bottom: none; }
+    .plat-dropdown-item:hover { background: #fffbea; }
+
+    .plat-dropdown-item .dd-plat {
+        font-weight: 700;
+        color: #1a1a1a;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+    .plat-dropdown-item .dd-detail {
+        font-size: 11px;
+        color: #aaa;
+    }
+
+    .plat-dropdown-no-result {
+        padding: 14px;
+        text-align: center;
+        color: #bbb;
+        font-size: 12px;
+    }
+
+    /* ── VEHICLE PREVIEW CARD ── */
+    .kendaraan-preview {
+        display: none;
+        margin-top: 20px;
+        background: #f8f7f2;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1.5px solid #e8e4dc;
+        animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .kendaraan-preview .preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 0 20px;
+    }
+
+    .kendaraan-preview .preview-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #666;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    .kendaraan-preview .preview-badge {
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+    }
+
+    .preview-badge.motor  { background: rgba(74,158,255,0.15); color: #4a9eff; }
+    .preview-badge.mobil  { background: rgba(248,198,30,0.15);  color: #F8C61E; }
+    .preview-badge.bus    { background: rgba(76,175,125,0.15);  color: #4caf7d; }
+
+    .kendaraan-preview .preview-body {
+        display: flex;
+        align-items: flex-start;
+        gap: 32px;
+        padding: 28px;
+    }
+
+    .preview-img-box {
+        width: 300px;
+        height: 280px;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #efefed;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid #e0dcd2;
+    }
+
+    .preview-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .preview-img-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: #999;
+    }
+
+    .preview-info {
+        flex: 1;
+    }
+
+    .preview-plat {
+        font-size: 48px;
+        font-weight: 900;
+        color: #1a1a1a;
+        letter-spacing: 3px;
+        line-height: 1;
+        margin-bottom: 20px;
+        font-family: 'Courier New', monospace;
+    }
+
+    .preview-rows {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 32px;
+    }
+
+    .preview-row-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .preview-row-key {
+        font-size: 13px;
+        color: #888;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .preview-row-val {
+        font-size: 20px;
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+
+    /* ── FORM SELECT AREA ── */
+    .form-select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1.5px solid #e8e4dc;
+        border-radius: 10px;
+        font-size: 14px;
         color: #1a1a1a;
         background: #fff;
         appearance: none;
@@ -85,11 +291,10 @@
         transition: border-color 0.2s;
         box-sizing: border-box;
         font-family: inherit;
+        font-weight: 600;
     }
 
-    .form-select:focus, .form-input:focus {
-        border-color: #F8C61E;
-    }
+    .form-select:focus { border-color: #F8C61E; }
 
     .select-wrapper {
         position: relative;
@@ -98,7 +303,7 @@
     .select-wrapper::after {
         content: '';
         position: absolute;
-        right: 14px;
+        right: 16px;
         top: 50%;
         transform: translateY(-50%);
         width: 0;
@@ -109,39 +314,35 @@
         pointer-events: none;
     }
 
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 14px;
-    }
-
     .btn-catat {
         width: 100%;
-        padding: 13px;
+        padding: 16px;
         background: #F8C61E;
         color: #1a1a1a;
         border: none;
-        border-radius: 10px;
-        font-size: 14px;
+        border-radius: 12px;
+        font-size: 15px;
         font-weight: 800;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
         transition: background 0.2s, transform 0.1s;
-        margin-top: 4px;
+        margin-top: 8px;
     }
 
     .btn-catat:hover { background: #e6b418; }
     .btn-catat:active { transform: scale(0.98); }
 
-    /* ===== SEARCH CARD ===== */
+    /* ── SEARCH CARD (Proses Keluar) ── */
     .search-card-label {
-        font-size: 13px;
-        color: #bbb;
-        margin-bottom: 16px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #666;
+        letter-spacing: 0.6px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
     }
 
     .search-input-wrapper {
@@ -150,7 +351,7 @@
 
     .search-input-wrapper svg {
         position: absolute;
-        left: 12px;
+        left: 14px;
         top: 50%;
         transform: translateY(-50%);
         color: #bbb;
@@ -158,22 +359,23 @@
 
     .search-input {
         width: 100%;
-        padding: 10px 14px 10px 38px;
+        padding: 14px 16px 14px 44px;
         border: 1.5px solid #e8e4dc;
         border-radius: 10px;
-        font-size: 13px;
+        font-size: 14px;
         color: #1a1a1a;
         outline: none;
         transition: border-color 0.2s;
         box-sizing: border-box;
         font-family: inherit;
+        background: #fff;
+        font-weight: 600;
     }
 
     .search-input:focus { border-color: #F8C61E; }
 
-    /* search result box */
     .search-result-box {
-        margin-top: 12px;
+        margin-top: 8px;
         display: none;
     }
 
@@ -187,48 +389,46 @@
     }
 
     .search-result-item:hover { background: #f5f3ef; }
-
     .search-result-item .plat { font-weight: 700; color: #1a1a1a; }
     .search-result-item .detail { font-size: 11px; color: #aaa; margin-top: 2px; }
 
-    /* ===== BOTTOM TABLE ===== */
+    /* ── TABLE ── */
     .section-title {
-        font-size: 18px;
+        font-size: 24px;
         font-weight: 800;
         color: #1a1a1a;
-        margin-bottom: 2px;
+        margin-bottom: 4px;
     }
 
     .section-sub {
-        font-size: 12px;
+        font-size: 13px;
         color: #aaa;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
     }
 
     .table-card {
         background: #fff;
-        border-radius: 16px;
+        border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
 
     .filter-row {
         display: flex;
-        gap: 12px;
-        padding: 16px 20px;
-        border-bottom: 1px solid #f0ede8;
+        gap: 14px;
+        padding: 18px 22px;
         align-items: center;
     }
 
     .filter-search-wrapper {
         position: relative;
         flex: 1;
-        max-width: 300px;
+        max-width: 360px;
     }
 
     .filter-search-wrapper svg {
         position: absolute;
-        left: 12px;
+        left: 16px;
         top: 50%;
         transform: translateY(-50%);
         color: #bbb;
@@ -236,16 +436,17 @@
 
     .filter-search {
         width: 100%;
-        padding: 9px 14px 9px 36px;
+        padding: 12px 16px 12px 42px;
         border: 1.5px solid #e8e4dc;
         border-radius: 50px;
-        font-size: 13px;
+        font-size: 14px;
         color: #1a1a1a;
         outline: none;
         transition: border-color 0.2s;
         box-sizing: border-box;
         font-family: inherit;
         background: #fff;
+        font-weight: 600;
     }
 
     .filter-search:focus { border-color: #F8C61E; }
@@ -257,7 +458,7 @@
     .filter-sort-wrapper::after {
         content: '';
         position: absolute;
-        right: 14px;
+        right: 16px;
         top: 50%;
         transform: translateY(-50%);
         width: 0;
@@ -269,11 +470,11 @@
     }
 
     .filter-sort {
-        padding: 9px 34px 9px 14px;
+        padding: 12px 40px 12px 18px;
         border: 1.5px solid #e8e4dc;
         border-radius: 50px;
         font-size: 13px;
-        color: #888;
+        color: #555;
         outline: none;
         appearance: none;
         -webkit-appearance: none;
@@ -281,6 +482,7 @@
         font-family: inherit;
         cursor: pointer;
         transition: border-color 0.2s;
+        font-weight: 600;
     }
 
     .filter-sort:focus { border-color: #F8C61E; }
@@ -296,11 +498,11 @@
 
     .parkir-table thead th {
         color: #fff;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
         letter-spacing: 0.8px;
         text-transform: uppercase;
-        padding: 14px 20px;
+        padding: 16px 22px;
         text-align: left;
     }
 
@@ -313,29 +515,29 @@
     .parkir-table tbody tr:hover { background: #fdfcf9; }
 
     .parkir-table tbody td {
-        padding: 15px 20px;
-        font-size: 13px;
+        padding: 18px 22px;
+        font-size: 14px;
         color: #444;
         vertical-align: middle;
     }
 
-    .plat-text { font-weight: 600; color: #1a1a1a; letter-spacing: 0.3px; }
+    .plat-text { font-weight: 700; color: #1a1a1a; letter-spacing: 0.4px; font-size: 15px; }
 
-    .jenis-text.motor { color: #4a9eff; font-weight: 600; }
-    .jenis-text.mobil { color: #F8C61E; font-weight: 600; }
-    .jenis-text.bus   { color: #4caf7d; font-weight: 600; }
+    .jenis-text.motor { color: #4a9eff; font-weight: 700; font-size: 14px; }
+    .jenis-text.mobil { color: #F8C61E; font-weight: 700; font-size: 14px; }
+    .jenis-text.bus   { color: #4caf7d; font-weight: 700; font-size: 14px; }
 
-    .tarif-text { color: #F8C61E; font-weight: 700; }
+    .tarif-text { color: #F8C61E; font-weight: 700; font-size: 15px; }
 
     .aksi-btn {
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 700;
         text-decoration: none;
         cursor: pointer;
         border: none;
         background: none;
         padding: 0;
-        margin-right: 12px;
+        margin-right: 14px;
     }
     .aksi-btn.keluar { color: #e05a5a; }
     .aksi-btn.struk  { color: #4a9eff; }
@@ -343,8 +545,8 @@
     .empty-state {
         text-align: center;
         color: #bbb;
-        padding: 40px 20px;
-        font-size: 13px;
+        padding: 50px 20px;
+        font-size: 14px;
     }
 
     @media (max-width: 900px) {
@@ -381,29 +583,68 @@
 
     {{-- FORM CATAT MASUK --}}
     <div class="form-card">
+        <div class="card-title">Kendaraan Masuk</div>
         <form method="POST" action="{{ route('petugas.transaksi.store') }}">
             @csrf
 
-            {{-- Dropdown Kendaraan --}}
+            {{-- Hidden input untuk kirim kendaraan_id --}}
+            <input type="hidden" name="kendaraan_id" id="selectedKendaraanId">
+
             <div class="form-group">
-                <label class="form-label">Plat Nomor Kendaraan</label>
-                <div class="select-wrapper">
-                    <select name="kendaraan_id" class="form-select" required>
-                        <option value="" disabled selected>-- Pilih Kendaraan --</option>
-                        @foreach ($kendaraanList as $k)
-                            <option value="{{ $k->id }}" {{ old('kendaraan_id') == $k->id ? 'selected' : '' }}>
-                                {{ $k->plat_nomor }} — {{ ucfirst($k->jenis) }}
-                        @endforeach
-                    </select>
+                <label class="form-label">Plat Nomor</label>
+                <div class="plat-search-wrapper">
+                    <input
+                        type="text"
+                        id="platSearchInput"
+                        class="plat-search-input"
+                        placeholder="Ketik plat nomor..."
+                        autocomplete="off"
+                    >
+                    <div class="plat-dropdown" id="platDropdown"></div>
                 </div>
                 @error('kendaraan_id')
                     <div style="color:#e05a5a; font-size:11px; margin-top:4px;">{{ $message }}</div>
                 @enderror
             </div>
 
-            {{-- Dropdown Area --}}
-            <div class="form-group">
-                <label class="form-label">Area Parkir</label>
+            {{-- PREVIEW DATA KENDARAAN --}}
+            <div class="kendaraan-preview" id="kendaraanPreview">
+                <div class="preview-header">
+                    <span class="preview-label">Data Kendaraan</span>
+                    <span class="preview-badge" id="previewBadge"></span>
+                </div>
+                <div class="preview-body">
+                    <div class="preview-img-box" id="previewImgBox">
+                        <div class="preview-img-placeholder" id="previewImgPlaceholder">
+                            <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <rect x="2" y="7" width="20" height="10" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                                <circle cx="7" cy="17" r="1.5"/><circle cx="17" cy="17" r="1.5"/>
+                            </svg>
+                        </div>
+                        <img src="" alt="Kendaraan" id="previewImg" style="display:none;">
+                    </div>
+                    <div class="preview-info">
+                        <div class="preview-plat" id="previewPlat">-</div>
+                        <div class="preview-rows">
+                            <div class="preview-row-item">
+                                <span class="preview-row-key">Pemilik</span>
+                                <span class="preview-row-val" id="previewPemilik">-</span>
+                            </div>
+                            <div class="preview-row-item">
+                                <span class="preview-row-key">Jenis</span>
+                                <span class="preview-row-val" id="previewJenis">-</span>
+                            </div>
+                            <div class="preview-row-item">
+                                <span class="preview-row-key">Warna</span>
+                                <span class="preview-row-val" id="previewWarna">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top:14px;">
+                <label class="form-label">Area</label>
                 <div class="select-wrapper">
                     <select name="area_id" class="form-select" required>
                         <option value="" disabled selected>-- Pilih Area --</option>
@@ -419,7 +660,7 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn-catat">
+            <button type="submit" class="btn-catat" id="btnCatat" disabled style="opacity:0.5;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
@@ -428,8 +669,9 @@
         </form>
     </div>
 
-    {{-- SEARCH KENDARAAN --}}
+    {{-- SEARCH KENDARAAN (Proses Keluar) --}}
     <div class="search-card">
+        <div class="card-title">Proses Keluar</div>
         <div class="search-card-label">Cari Plat Nomor</div>
         <div class="search-input-wrapper">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -443,9 +685,8 @@
                 autocomplete="off"
             >
         </div>
-        <div class="search-result-box" id="searchResultBox">
-            {{-- hasil muncul via JS --}}
-        </div>
+        {{-- BUTTON CARI DIHAPUS --}}
+        <div class="search-result-box" id="searchResultBox"></div>
     </div>
 
 </div>
@@ -479,20 +720,20 @@
                 <th>Jenis</th>
                 <th>Masuk</th>
                 <th>Area</th>
-                <th></th>
-                <th></th>
-                <th></th>
+                <th>Durasi</th>
+                <th>Estimasi</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody id="parkirTableBody">
             @forelse ($kendaraanParkir as $t)
                 <tr
-                    data-plat="{{ strtolower($t->kendaraan->no_plat ?? '') }}"
+                    data-plat="{{ strtolower($t->kendaraan->plat_nomor ?? '') }}"
                     data-masuk="{{ $t->waktu_masuk }}"
                 >
                     <td><span class="plat-text">{{ $t->kendaraan->plat_nomor ?? '-' }}</span></td>
                     <td>
-                        <span class="jenis-text {{ strtolower($t->kendaraan->jenis ?? 'motor') }}">
+                        <span class="jenis-text {{ strtolower(str_replace('/', '', $t->kendaraan->jenis ?? 'motor')) }}">
                             {{ ucfirst($t->kendaraan->jenis ?? '-') }}
                         </span>
                     </td>
@@ -516,74 +757,193 @@
     </table>
 </div>
 
-{{-- SCRIPT: Search dan Filter --}}
 <script>
 (function() {
     'use strict';
 
-    // Inisialisasi saat DOM siap
+    // Data kendaraan lengkap dari DB (include gambar, warna, nama_pemilik)
+    const kendaraanData = @json($kendaraanList);
+
     document.addEventListener('DOMContentLoaded', function() {
-        initializeSearch();
+        initPlatSearch();
+        initProseKeluar();
         initializeFilter();
     });
 
-    /**
-     * Inisialisasi fitur pencarian kendaraan
-     */
-    function initializeSearch() {
-        const kendaraanData = @json($kendaraanList->map(fn($k) => [
-            'id' => $k->id,
-            'plat' => $k->plat_nomor,
-            'jenis' => ucfirst($k->jenis)
-        ]));
+    // ─── PLAT SEARCH + PREVIEW ─────────────────────────────────────
+    function initPlatSearch() {
+        const input      = document.getElementById('platSearchInput');
+        const dropdown   = document.getElementById('platDropdown');
+        const hiddenId   = document.getElementById('selectedKendaraanId');
+        const preview    = document.getElementById('kendaraanPreview');
+        const btnCatat   = document.getElementById('btnCatat');
 
-        const searchInput = document.getElementById('searchPlat');
-        const resultBox = document.getElementById('searchResultBox');
-        const selectKendaraan = document.querySelector('select[name="kendaraan_id"]');
+        if (!input) return;
 
-        if (!searchInput || !resultBox || !selectKendaraan) {
-            console.error('Search elements not found');
-            return;
-        }
+        input.addEventListener('focus', function() {
+            const q = this.value.trim().toUpperCase();
+            renderDropdown(q);
+        });
 
-        // Event: Input search
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            resultBox.innerHTML = '';
-            resultBox.style.display = 'none';
+        input.addEventListener('input', function() {
+            const q = this.value.trim().toUpperCase();
+            renderDropdown(q);
+        });
 
-            if (query.length < 1) {
-                return;
+        input.addEventListener('blur', function() {
+            setTimeout(() => closeDropdown(), 200);
+        });
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeDropdown();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                closeDropdown();
             }
+        });
 
-            const matches = kendaraanData.filter(k => 
-                k.plat.toLowerCase().includes(query)
-            );
+        function renderDropdown(q) {
+            dropdown.innerHTML = '';
+
+            // Tampilkan semua kendaraan jika input kosong, atau filter berdasarkan query
+            const matches = q.length < 1 
+                ? kendaraanData 
+                : kendaraanData.filter(k => k.plat_nomor.toUpperCase().includes(q));
 
             if (matches.length === 0) {
-                resultBox.innerHTML = '<div class="search-result-item" style="color:#bbb;">Tidak ditemukan.</div>';
-                resultBox.style.display = 'block';
+                dropdown.innerHTML = '<div class="plat-dropdown-no-result">Tidak ditemukan</div>';
+                dropdown.style.display = 'block';
                 return;
             }
 
             matches.forEach(function(k) {
-                const element = document.createElement('div');
-                element.className = 'search-result-item';
-                element.innerHTML = '<div class="plat">' + escapeHtml(k.plat) + '</div><div class="detail">' + escapeHtml(k.jenis) + '</div>';
-                
-                element.addEventListener('click', function() {
-                    selectKendaraan.value = k.id;
-                    searchInput.value = k.plat;
-                    resultBox.style.display = 'none';
+                const item = document.createElement('div');
+                item.className = 'plat-dropdown-item';
+                item.innerHTML =
+                    '<div>' +
+                        '<div class="dd-plat">' + escapeHtml(k.plat_nomor) + '</div>' +
+                        '<div class="dd-detail">' + escapeHtml(k.jenis) + ' · ' + escapeHtml(k.warna) + ' · ' + escapeHtml(k.nama_pemilik) + '</div>' +
+                    '</div>';
+
+                item.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    selectKendaraan(k);
                 });
 
-                resultBox.appendChild(element);
+                dropdown.appendChild(item);
+            });
+
+            dropdown.style.display = 'block';
+        }
+
+        function selectKendaraan(k) {
+            input.value        = k.plat_nomor;
+            hiddenId.value     = k.id;
+            closeDropdown();
+            showPreview(k);
+
+            btnCatat.disabled = false;
+            btnCatat.style.opacity = '1';
+        }
+
+        function closeDropdown() {
+            dropdown.style.display = 'none';
+        }
+
+        function showPreview(k) {
+            // Badge jenis
+            const badge = document.getElementById('previewBadge');
+            const jenisKey = k.jenis.toLowerCase().replace(/truk/i, '').replace(/bus/i, '');
+            badge.textContent  = k.jenis;
+            badge.className    = 'preview-badge ' + (
+                k.jenis === 'Motor'    ? 'motor' :
+                k.jenis === 'Mobil'   ? 'mobil' :
+                'bus'
+            );
+
+            // Plat
+            document.getElementById('previewPlat').textContent    = k.plat_nomor;
+            document.getElementById('previewPemilik').textContent = k.nama_pemilik || '-';
+            document.getElementById('previewJenis').textContent   = k.jenis || '-';
+            document.getElementById('previewWarna').textContent   = k.warna || '-';
+
+            // Gambar - PASTIKAN PATH BENAR DARI DB
+            const img         = document.getElementById('previewImg');
+            const placeholder = document.getElementById('previewImgPlaceholder');
+
+            if (k.gambar && k.gambar.trim() !== '') {
+                // Image path dari database
+                const imagePath = k.gambar.startsWith('/') ? k.gambar : '/storage/' + k.gambar;
+                img.src              = imagePath;
+                img.style.display    = 'block';
+                placeholder.style.display = 'none';
+                
+                // Handle image load error - tampilkan placeholder jika gagal
+                img.onerror = function() {
+                    img.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                };
+            } else {
+                img.style.display    = 'none';
+                placeholder.style.display = 'flex';
+            }
+
+            preview.style.display = 'block';
+        }
+    }
+
+    // ─── PROSES KELUAR: SEARCH PLAT (auto hasil, tanpa tombol) ────────
+    function initProseKeluar() {
+        const searchInput = document.getElementById('searchPlat');
+        const resultBox   = document.getElementById('searchResultBox');
+
+        if (!searchInput || !resultBox) return;
+
+        // Data kendaraan yang sedang parkir (dari tabel)
+        const parkirRows = Array.from(document.querySelectorAll('#parkirTableBody tr[data-plat]'));
+
+        searchInput.addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            resultBox.innerHTML = '';
+            resultBox.style.display = 'none';
+
+            if (q.length < 1) return;
+
+            const matches = parkirRows.filter(row => row.dataset.plat.includes(q));
+
+            if (matches.length === 0) {
+                resultBox.innerHTML = '<div class="search-result-item" style="color:#bbb;">Tidak ditemukan di area parkir.</div>';
+                resultBox.style.display = 'block';
+                return;
+            }
+
+            matches.forEach(function(row) {
+                const plat   = row.querySelector('.plat-text')?.textContent || '';
+                const jenis  = row.querySelector('.jenis-text')?.textContent || '';
+                const area   = row.cells[3]?.textContent || '';
+                const masuk  = row.cells[2]?.textContent || '';
+                const aksiEl = row.querySelector('.aksi-btn.keluar');
+
+                const item = document.createElement('div');
+                item.className = 'search-result-item';
+                item.innerHTML =
+                    '<div class="plat">' + escapeHtml(plat) + '</div>' +
+                    '<div class="detail">' + escapeHtml(jenis) + ' · ' + escapeHtml(area) + ' · Masuk ' + escapeHtml(masuk) + '</div>';
+
+                if (aksiEl) {
+                    item.addEventListener('click', function() {
+                        window.location.href = aksiEl.href;
+                    });
+                }
+
+                resultBox.appendChild(item);
             });
 
             resultBox.style.display = 'block';
         });
 
-        // Event: Klik di luar untuk tutup hasil
         document.addEventListener('click', function(e) {
             if (!searchInput.contains(e.target) && !resultBox.contains(e.target)) {
                 resultBox.style.display = 'none';
@@ -591,79 +951,51 @@
         });
     }
 
-    /**
-     * Inisialisasi fitur filter dan sort tabel
-     */
+    // ─── FILTER TABEL ────────────────────────────────────────────────
     function initializeFilter() {
         const filterPlat = document.getElementById('filterPlat');
         const filterSort = document.getElementById('filterSort');
-        const tbody = document.getElementById('parkirTableBody');
+        const tbody      = document.getElementById('parkirTableBody');
 
-        if (!filterPlat || !filterSort || !tbody) {
-            console.error('Filter elements not found');
-            return;
-        }
+        if (!filterPlat || !filterSort || !tbody) return;
 
-        // Event: Filter plat
         filterPlat.addEventListener('input', applyFilter);
-
-        // Event: Sort
         filterSort.addEventListener('change', applyFilter);
 
-        /**
-         * Terapkan filter dan sort ke tabel
-         */
         function applyFilter() {
-            const query = filterPlat.value.toLowerCase().trim();
+            const query  = filterPlat.value.toLowerCase().trim();
             const sortBy = filterSort.value;
 
-            // Ambil semua rows
             let rows = Array.from(tbody.querySelectorAll('tr[data-plat]'));
 
-            // Filter berdasarkan plat
             rows.forEach(function(row) {
                 const plat = row.dataset.plat || '';
                 row.style.display = plat.includes(query) ? '' : 'none';
             });
 
-            // Sort rows yang terlihat
             const visibleRows = rows.filter(r => r.style.display !== 'none');
 
             visibleRows.sort(function(a, b) {
                 const aMasuk = new Date(a.dataset.masuk);
                 const bMasuk = new Date(b.dataset.masuk);
-                const aPlat = a.dataset.plat;
-                const bPlat = b.dataset.plat;
+                const aPlat  = a.dataset.plat;
+                const bPlat  = b.dataset.plat;
 
                 switch(sortBy) {
-                    case 'masuk_asc':
-                        return aMasuk - bMasuk;
-                    case 'masuk_desc':
-                        return bMasuk - aMasuk;
-                    case 'plat_asc':
-                        return aPlat.localeCompare(bPlat);
-                    default:
-                        return 0;
+                    case 'masuk_asc':  return aMasuk - bMasuk;
+                    case 'masuk_desc': return bMasuk - aMasuk;
+                    case 'plat_asc':   return aPlat.localeCompare(bPlat);
+                    default:           return 0;
                 }
             });
 
-            // Re-insert sorted rows
             visibleRows.forEach(row => tbody.appendChild(row));
         }
     }
 
-    /**
-     * Helper: Escape HTML untuk prevent XSS
-     */
     function escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
     }
 
 })();

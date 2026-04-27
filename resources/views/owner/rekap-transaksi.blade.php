@@ -10,6 +10,11 @@
 @section('content')
 
 <style>
+    /* ===== PAGE BACKGROUND ===== */
+    body, .content-area, .main-content {
+        background: #F5F0E8 !important;
+    }
+
     .top-header {
         display: flex;
         align-items: center;
@@ -29,11 +34,12 @@
     }
 
     .greeting h1 {
-        font-size: 36px;
+        font-size: 40px;
         font-weight: 900;
         color: #1a1a1a;
-        letter-spacing: -1px;
+        letter-spacing: -1.5px;
         margin-bottom: 6px;
+        line-height: 1.1;
     }
 
     .greeting p {
@@ -45,15 +51,14 @@
     /* ===== FILTER CARD ===== */
     .card {
         background: #fff;
-        border-radius: 16px;
+        border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         margin-bottom: 20px;
     }
 
     .filter-section {
-        padding: 24px;
-        border-bottom: 1px solid #f5f3ef;
+        padding: 28px 28px 24px;
     }
 
     .filter-row {
@@ -83,9 +88,9 @@
 
     .select-wrapper select,
     .filter-input {
-        padding: 10px 36px 10px 14px;
+        padding: 10px 36px 10px 16px;
         border: 1.5px solid #e8e4dc;
-        border-radius: 10px;
+        border-radius: 12px;
         font-size: 13px;
         color: #1a1a1a;
         background: #fff;
@@ -98,7 +103,7 @@
     }
 
     .filter-input {
-        padding-right: 14px;
+        padding-right: 16px;
         min-width: 150px;
     }
 
@@ -110,21 +115,22 @@
         transform: translateY(-50%);
         width: 0;
         height: 0;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
         border-top: 5px solid #aaa;
         pointer-events: none;
     }
 
     .btn-filter {
-        padding: 10px 20px;
-        border-radius: 10px;
+        padding: 10px 22px;
+        border-radius: 12px;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
         border: none;
         font-family: inherit;
         transition: all 0.2s;
+        height: 40px;
     }
 
     .btn-filter.primary {
@@ -145,24 +151,25 @@
         background: #2a2a2a;
     }
 
-    /* ===== STAT CARDS ===== */
+    /* ===== STAT CARDS — 4 separate rounded cards in a row ===== */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 0;
-        border-bottom: 1px solid #f5f3ef;
+        gap: 14px;
+        padding: 0 28px 28px;
     }
 
     .stat-card {
-        padding: 24px;
-        border-right: 1px solid #f5f3ef;
+        padding: 22px 20px;
+        border-radius: 16px;
         text-align: left;
+        border: 1.5px solid #ede9e0;
+        background: #fff;
     }
 
-    .stat-card:last-child {
-        border-right: none;
+    .stat-card.dark {
         background: #1C1C1E;
-        border-radius: 0;
+        border-color: #1C1C1E;
     }
 
     .stat-label {
@@ -174,8 +181,8 @@
         text-transform: uppercase;
     }
 
-    .stat-card:last-child .stat-label {
-        color: #888;
+    .stat-card.dark .stat-label {
+        color: #666;
     }
 
     .stat-value {
@@ -186,14 +193,13 @@
     }
 
     .stat-value.yellow { color: #F8C61E; }
-    .stat-card:last-child .stat-value { color: #F8C61E; }
+    .stat-card.dark .stat-value { color: #F8C61E; }
 
     /* ===== INNER FILTERS (search + sort) ===== */
     .inner-filters {
         display: flex;
         gap: 12px;
         padding: 20px 24px;
-        border-bottom: 1px solid #f5f3ef;
         flex-wrap: wrap;
     }
 
@@ -202,15 +208,15 @@
         align-items: center;
         gap: 10px;
         border: 1.5px solid #e8e4dc;
-        border-radius: 10px;
-        padding: 10px 14px;
+        border-radius: 50px;
+        padding: 10px 18px;
         background: #fff;
         flex: 1;
         min-width: 200px;
     }
 
     .filter-search i {
-        color: #aaa;
+        color: #ccc;
         font-size: 13px;
     }
 
@@ -225,7 +231,40 @@
     }
 
     .filter-search input::placeholder {
-        color: #bbb;
+        color: #ccc;
+    }
+
+    .sort-wrapper {
+        position: relative;
+    }
+
+    .sort-wrapper select {
+        padding: 10px 36px 10px 18px;
+        border: 1.5px solid #e8e4dc;
+        border-radius: 50px;
+        font-size: 13px;
+        color: #555;
+        background: #fff;
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        cursor: pointer;
+        font-family: inherit;
+        min-width: 130px;
+    }
+
+    .sort-wrapper::after {
+        content: '';
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid #aaa;
+        pointer-events: none;
     }
 
     /* ===== TABLE ===== */
@@ -267,14 +306,14 @@
     }
 
     .parkir-table tbody td {
-        padding: 15px 20px;
+        padding: 16px 20px;
         font-size: 13px;
-        color: #444;
+        color: #555;
         vertical-align: middle;
     }
 
     .row-id {
-        color: #bbb;
+        color: #ccc;
         font-weight: 600;
         width: 60px;
     }
@@ -287,12 +326,12 @@
 
     .jenis-text.motor {
         color: #4a9eff;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .jenis-text.mobil {
         color: #F8C61E;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .tarif-text {
@@ -310,11 +349,10 @@
     /* ===== PAGINATION ===== */
     .pagination-wrapper {
         display: flex;
-        justify-content: center;
+        justify-content: flex-end;
         align-items: center;
         gap: 8px;
-        padding: 24px;
-        border-top: 1px solid #f5f3ef;
+        padding: 20px 24px;
     }
 
     .page-link {
@@ -323,7 +361,7 @@
         justify-content: center;
         width: 36px;
         height: 36px;
-        border-radius: 8px;
+        border-radius: 10px;
         border: 1.5px solid #e8e4dc;
         background: #fff;
         color: #666;
@@ -346,7 +384,7 @@
     }
 
     .page-link.disabled {
-        opacity: 0.5;
+        opacity: 0.4;
         pointer-events: none;
     }
 
@@ -355,11 +393,11 @@
         align-items: center;
         justify-content: center;
         height: 36px;
-        padding: 0 12px;
-        border-radius: 8px;
+        padding: 0 16px;
+        border-radius: 10px;
         border: 1.5px solid #e8e4dc;
         background: #fff;
-        color: #666;
+        color: #555;
         text-decoration: none;
         font-size: 13px;
         font-weight: 600;
@@ -369,11 +407,11 @@
     .page-link-text:hover {
         background: #f8f6f2;
         border-color: #F8C61E;
+        color: #1a1a1a;
     }
 
     @media (max-width: 900px) {
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        .stat-card:nth-child(2) { border-right: none; }
     }
 </style>
 
@@ -461,7 +499,7 @@
             <div class="stat-label">Rata-rata Durasi</div>
             <div class="stat-value">{{ $rataDurasi ?? 0 }} mnt</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card dark">
             <div class="stat-label">Rata-rata Transaksi</div>
             <div class="stat-value">Rp {{ number_format($rataTransaksi ?? 0, 0, ',', '.') }}</div>
         </div>
@@ -483,7 +521,7 @@
                 oninput="document.getElementById('rekap-form').submit()"
             >
         </div>
-        <div class="select-wrapper">
+        <div class="sort-wrapper">
             <select name="sort" form="rekap-form" onchange="document.getElementById('rekap-form').submit()">
                 <option value="terbaru" {{ request('sort', 'terbaru') === 'terbaru' ? 'selected' : '' }}>Terbaru</option>
                 <option value="terlama" {{ request('sort') === 'terlama' ? 'selected' : '' }}>Terlama</option>
@@ -565,8 +603,8 @@
 
         {{-- Next --}}
         @if ($transaksis->hasMorePages())
-            <a href="{{ $transaksis->nextPageUrl() }}&{{ http_build_query(request()->except('page')) }}" class="page-link">
-                <i class="fa-solid fa-chevron-right"></i>
+            <a href="{{ $transaksis->nextPageUrl() }}&{{ http_build_query(request()->except('page')) }}" class="page-link-text">
+                selanjutnya
             </a>
         @else
             <span class="page-link disabled">

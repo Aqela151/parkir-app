@@ -431,9 +431,9 @@
                     <label>JENIS</label>
                     <select name="jenis" id="inputJenis" required>
                         <option value="" disabled selected>Pilih jenis</option>
-                        <option value="Motor">Motor</option>
-                        <option value="Mobil">Mobil</option>
-                        <option value="Bus/Truk">Bus/Truk</option>
+                        @foreach($tarifParkirs ?? [] as $tarif)
+                            <option value="{{ $tarif->jenis_kendaraan }}">{{ $tarif->jenis_kendaraan }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="modal-field">

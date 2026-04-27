@@ -4,20 +4,24 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kendaraan;
+use App\Models\TarifParkir;
 
 class KendaraanController extends Controller
 {
     public function index()
     {
         $kendaraans = Kendaraan::all();
-        return view('admin.data-kendaraan', compact('kendaraans'));
+        $tarifParkirs = TarifParkir::where('status', 'aktif')->get();
+        return view('admin.data-kendaraan', compact('kendaraans', 'tarifParkirs'));
     }
 
     public function store(Request $request)
     {
+        $jenisKendaraanValid = TarifParkir::where('status', 'aktif')->pluck('jenis_kendaraan')->toArray();
+        
         $request->validate([
             'plat_nomor' => 'required|string|unique:kendaraans',
-            'jenis' => 'required|in:Motor,Mobil,Bus/Truk',
+            'jenis' => ['required', 'in:' . implode(',', $jenisKendaraanValid)],
             'warna' => 'required|string',
             'nama_pemilik' => 'required|string',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -39,10 +43,11 @@ class KendaraanController extends Controller
     public function update(Request $request, $id)
     {
         $kendaraan = Kendaraan::findOrFail($id);
+        $jenisKendaraanValid = TarifParkir::where('status', 'aktif')->pluck('jenis_kendaraan')->toArray();
 
         $request->validate([
             'plat_nomor' => 'required|string|unique:kendaraans,plat_nomor,' . $id,
-            'jenis' => 'required|in:Motor,Mobil,Bus/Truk',
+            'jenis' => ['required', 'in:' . implode(',', $jenisKendaraanValid)],
             'warna' => 'required|string',
             'nama_pemilik' => 'required|string',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

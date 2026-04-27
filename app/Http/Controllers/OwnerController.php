@@ -6,9 +6,148 @@ use App\Models\AreaParkir;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OwnerController extends Controller
 {
+    public function dashboard()
+    {
+        // Pendapatan hari ini
+        $pendapatanHariIni = Transaksi::whereDate('waktu_masuk', today())
+            ->whereNotNull('tarif_akhir')
+            ->sum('tarif_akhir') ?? 0;
+        $pendapatanHariIniFormatted = 'Rp ' . number_format($pendapatanHariIni, 0, ',', '.');
+
+        // Trend pendapatan (hari ini vs kemarin)
+        $pendapatanKemarin = Transaksi::whereDate('waktu_masuk', today()->subDay())
+            ->whereNotNull('tarif_akhir')
+            ->sum('tarif_akhir') ?? 0;
+        $pendapatanTrend = $pendapatanKemarin > 0 ? round((($pendapatanHariIni - $pendapatanKemarin) / $pendapatanKemarin) * 100) : 0;
+
+        // Transaksi hari ini
+        $transaksiHariIni = Transaksi::whereDate('waktu_masuk', today())->count();
+        $lokasiAktif = AreaParkir::where('status', 'aktif')->count() . ' lokasi';
+
+        // Pendapatan bulan ini
+        $pendapatanBulanIni = Transaksi::whereMonth('waktu_masuk', date('m'))
+            ->whereYear('waktu_masuk', date('Y'))
+            ->whereNotNull('tarif_akhir')
+            ->sum('tarif_akhir') ?? 0;
+        $pendapatanBulanIniFormatted = 'Rp ' . number_format($pendapatanBulanIni, 0, ',', '.');
+
+        // Trend bulan ini vs bulan lalu
+        $pendapatanBulanLalu = Transaksi::whereMonth('waktu_masuk', date('m') - 1)
+            ->whereYear('waktu_masuk', date('Y'))
+            ->whereNotNull('tarif_akhir')
+            ->sum('tarif_akhir') ?? 0;
+        $pendapatanBulanTrend = $pendapatanBulanLalu > 0 ? round((($pendapatanBulanIni - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100) : 0;
+
+        // Jumlah area aktif
+        $jumlahAreaAktif = AreaParkir::where('status', 'aktif')->count();
+        
+        // Kapasitas rata-rata
+        $kapasitasRataRata = 0;
+        if ($jumlahAreaAktif > 0) {
+            $totalKapasitas = AreaParkir::where('status', 'aktif')->sum('kapasitas') ?? 0;
+            $totalTerisi = Transaksi::where('status', 'parkir')->count();
+            $kapasitasRataRata = $totalKapasitas > 0 ? round(($totalTerisi / $totalKapasitas) * 100) : 0;
+        }
+
+        // Chart harian (7 hari terakhir)
+        $chartHarian = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = today()->subDays($i);
+            $motor = Transaksi::whereDate('waktu_masuk', $date)
+                ->whereHas('kendaraan', function ($q) {
+                    $q->where('jenis', 'Motor');
+                })
+                ->whereNotNull('tarif_akhir')
+                ->sum('tarif_akhir') ?? 0;
+
+            $mobil = Transaksi::whereDate('waktu_masuk', $date)
+                ->whereHas('kendaraan', function ($q) {
+                    $q->where('jenis', 'Mobil');
+                })
+                ->whereNotNull('tarif_akhir')
+                ->sum('tarif_akhir') ?? 0;
+
+            $chartHarian[] = [
+                'motor' => $motor,
+                'mobil' => $mobil
+            ];
+        }
+
+        // Total masuk/keluar hari ini
+        $totalMasuk = Transaksi::whereDate('waktu_masuk', today())->count();
+        $totalKeluar = Transaksi::whereDate('waktu_keluar', today())->whereNotNull('waktu_keluar')->count();
+
+        // Pendapatan bulan lalu
+        $pendapatanBulanLaluFormatted = 'Rp ' . number_format($pendapatanBulanLalu, 0, ',', '.');
+
+        // Pendapatan per area (bulan ini)
+        $pendapatanPerArea = AreaParkir::where('area_parkirs.status', 'aktif')
+            ->select('area_parkirs.id', 'area_parkirs.nama_area as nama', 'area_parkirs.lokasi as alamat', DB::raw('SUM(COALESCE(t.tarif_akhir, 0)) as pendapatan'))
+            ->leftJoin('transaksis as t', function ($join) {
+                $join->on('area_parkirs.id', '=', 't.area_id')
+                     ->whereMonth('t.waktu_masuk', date('m'))
+                     ->whereYear('t.waktu_masuk', date('Y'));
+            })
+            ->groupBy('area_parkirs.id', 'area_parkirs.nama_area', 'area_parkirs.lokasi')
+            ->orderByDesc('pendapatan')
+            ->get()
+            ->map(function ($area) {
+                return [
+                    'nama' => $area->nama,
+                    'alamat' => $area->alamat,
+                    'pendapatan' => $area->pendapatan,
+                    'pendapatanFormatted' => 'Rp ' . number_format($area->pendapatan, 0, ',', '.')
+                ];
+            })
+            ->toArray();
+
+        // Area tersibuk hari ini
+        $areaTersibuk = Transaksi::whereDate('waktu_masuk', today())
+            ->select('area_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('area_id')
+            ->orderByDesc('count')
+            ->first();
+        $areaTersibuk = AreaParkir::find($areaTersibuk?->area_id)?->nama_area ?? '-';
+
+        // Jam tersibuk hari ini
+        $jamTersibuk = Transaksi::whereDate('waktu_masuk', today())
+            ->select(DB::raw('HOUR(waktu_masuk) as jam'), DB::raw('COUNT(*) as count'))
+            ->groupBy(DB::raw('HOUR(waktu_masuk)'))
+            ->orderByDesc('count')
+            ->first();
+        $jamTersibuk = $jamTersibuk ? $jamTersibuk->jam . ':00' : '-';
+
+        // Petugas aktif
+        $petugasAktif = \App\Models\User::where('role', 'petugas')
+            ->where('status', 'aktif')
+            ->count();
+
+        return view('owner.dashboard', compact(
+            'pendapatanHariIniFormatted',
+            'pendapatanTrend',
+            'transaksiHariIni',
+            'lokasiAktif',
+            'pendapatanBulanIniFormatted',
+            'pendapatanBulanTrend',
+            'jumlahAreaAktif',
+            'kapasitasRataRata',
+            'chartHarian',
+            'totalMasuk',
+            'totalKeluar',
+            'pendapatanBulanLaluFormatted',
+            'pendapatanPerArea',
+            'areaTersibuk',
+            'jamTersibuk',
+            'petugasAktif'
+        ));
+    }
+
     public function rekapTransaksi(Request $request)
     {
         $areas = AreaParkir::where('status', 'aktif')->get();
@@ -196,6 +335,88 @@ class OwnerController extends Controller
                 ];
             })
             ->toArray();
+
+        // Handle export XLSX
+        if ($request->get('export') === 'xlsx') {
+            $fileName = 'grafik-pendapatan-' . $tahun . '-' . ($areaId ? AreaParkir::find($areaId)?->nama_area : 'semua-area') . '.xlsx';
+            
+            $spreadsheet = new Spreadsheet();
+            
+            // Sheet 1: Ringkasan
+            $sheet1 = $spreadsheet->getActiveSheet();
+            $sheet1->setTitle('Ringkasan');
+            $sheet1->setCellValue('A1', 'Laporan Grafik Pendapatan Tahun ' . $tahun);
+            $sheet1->setCellValue('A2', 'Tanggal Export: ' . now()->format('d-m-Y H:i:s'));
+            $sheet1->setCellValue('A3', 'Area: ' . ($areaId ? AreaParkir::find($areaId)?->nama_area : 'Semua Area'));
+            
+            $sheet1->setCellValue('A5', 'Keterangan');
+            $sheet1->setCellValue('B5', 'Nilai');
+            $sheet1->setCellValue('A6', 'Total Pendapatan Tahun');
+            $sheet1->setCellValue('B6', str_replace('Rp ', '', $totalTahunFormatted));
+            $sheet1->setCellValue('A7', 'Bulan Tertinggi');
+            $sheet1->setCellValue('B7', $bulanTertinggi);
+            $sheet1->setCellValue('A8', 'Pendapatan Bulan Tertinggi');
+            $sheet1->setCellValue('B8', str_replace('Rp ', '', $pendapatanBulanTertinggiFormatted));
+            $sheet1->setCellValue('A9', 'Rata-rata per Bulan');
+            $sheet1->setCellValue('B9', str_replace('Rp ', '', $rataRataBulanFormatted));
+            $sheet1->setCellValue('A10', 'Trend vs Tahun Lalu');
+            $sheet1->setCellValue('B10', ($trendTahunan > 0 ? '+' : '') . $trendTahunan . '%');
+            
+            $sheet1->getColumnDimension('A')->setAutoSize(true);
+            $sheet1->getColumnDimension('B')->setAutoSize(true);
+            
+            // Sheet 2: Per Bulan
+            $sheet2 = $spreadsheet->createSheet();
+            $sheet2->setTitle('Per Bulan');
+            $sheet2->setCellValue('A1', 'Bulan');
+            $sheet2->setCellValue('B1', 'Motor');
+            $sheet2->setCellValue('C1', 'Mobil');
+            $sheet2->setCellValue('D1', 'Total');
+            $sheet2->setCellValue('E1', 'Trend vs Bulan Lalu');
+            
+            $row = 2;
+            foreach ($detailBulanan as $item) {
+                $sheet2->setCellValue('A' . $row, $item['bulan']);
+                $sheet2->setCellValue('B' . $row, str_replace('Rp ', '', $item['motorFormatted']));
+                $sheet2->setCellValue('C' . $row, str_replace('Rp ', '', $item['mobilFormatted']));
+                $sheet2->setCellValue('D' . $row, str_replace('Rp ', '', $item['totalFormatted']));
+                $sheet2->setCellValue('E' . $row, ($item['trend'] > 0 ? '+' : '') . $item['trend'] . '%');
+                $row++;
+            }
+            
+            foreach (['A', 'B', 'C', 'D', 'E'] as $col) {
+                $sheet2->getColumnDimension($col)->setAutoSize(true);
+            }
+            
+            // Sheet 3: Per Area
+            $sheet3 = $spreadsheet->createSheet();
+            $sheet3->setTitle('Per Area');
+            $sheet3->setCellValue('A1', 'Rank');
+            $sheet3->setCellValue('B1', 'Area');
+            $sheet3->setCellValue('C1', 'Total Pendapatan');
+            
+            $row = 2;
+            foreach ($pendapatanPerArea as $i => $area) {
+                $sheet3->setCellValue('A' . $row, $i + 1);
+                $sheet3->setCellValue('B' . $row, $area['nama']);
+                $sheet3->setCellValue('C' . $row, str_replace('Rp ', '', $area['totalFormatted']));
+                $row++;
+            }
+            
+            foreach (['A', 'B', 'C'] as $col) {
+                $sheet3->getColumnDimension($col)->setAutoSize(true);
+            }
+            
+            $writer = new Xlsx($spreadsheet);
+            $response = response()->stream(function() use ($writer) {
+                $writer->save('php://output');
+            }, 200, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+            ]);
+            
+            return $response;
+        }
 
         // Handle export PDF (placeholder)
         if ($request->get('export') === 'pdf') {
