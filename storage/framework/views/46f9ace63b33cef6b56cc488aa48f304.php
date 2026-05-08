@@ -1,13 +1,13 @@
-@extends('layouts.app')
 
-@section('title', 'Riwayat Transaksi')
-@section('page-title', 'Riwayat Transaksi')
 
-@section('sidebar')
-    @include('components.sidebar.petugas')
-@endsection
+<?php $__env->startSection('title', 'Riwayat Transaksi'); ?>
+<?php $__env->startSection('page-title', 'Riwayat Transaksi'); ?>
 
-@section('content')
+<?php $__env->startSection('sidebar'); ?>
+    <?php echo $__env->make('components.sidebar.petugas', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
 
 <style>
     .top-header {
@@ -280,29 +280,29 @@
     }
 </style>
 
-{{-- TOP HEADER --}}
+
 <div class="top-header">
     <span></span>
     <span class="petugas-panel-badge">PETUGAS PANEL</span>
 </div>
 
-{{-- GREETING --}}
+
 <div class="greeting">
     <h1>Riwayat Transaksi</h1>
     <p>Semua transaksi parkir dengan filter dan paginasi</p>
 </div>
 
 <div class="card">
-    {{-- FILTERS --}}
+    
     <div class="filters">
-        <form id="filter-form" method="GET" action="{{ route('petugas.riwayat-transaksi') }}" style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; width:100%;">
+        <form id="filter-form" method="GET" action="<?php echo e(route('petugas.riwayat-transaksi')); ?>" style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; width:100%;">
             <div class="filter-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input
                     type="text"
                     name="search"
                     placeholder="Cari plat..."
-                    value="{{ request('search') }}"
+                    value="<?php echo e(request('search')); ?>"
                     oninput="this.form.submit()"
                     autocomplete="off"
                 >
@@ -311,22 +311,22 @@
             <div class="select-wrapper">
                 <select name="status" onchange="this.form.submit()">
                     <option value="">Status: semua</option>
-                    <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
-                    <option value="parkir" {{ request('status') === 'parkir' ? 'selected' : '' }}>Parkir</option>
+                    <option value="selesai" <?php echo e(request('status') === 'selesai' ? 'selected' : ''); ?>>Selesai</option>
+                    <option value="parkir" <?php echo e(request('status') === 'parkir' ? 'selected' : ''); ?>>Parkir</option>
                 </select>
             </div>
 
             <div class="select-wrapper">
                 <select name="jenis" onchange="this.form.submit()">
                     <option value="">Jenis: semua</option>
-                    <option value="Mobil" {{ request('jenis') === 'Mobil' ? 'selected' : '' }}>Mobil</option>
-                    <option value="Motor" {{ request('jenis') === 'Motor' ? 'selected' : '' }}>Motor</option>
+                    <option value="Mobil" <?php echo e(request('jenis') === 'Mobil' ? 'selected' : ''); ?>>Mobil</option>
+                    <option value="Motor" <?php echo e(request('jenis') === 'Motor' ? 'selected' : ''); ?>>Motor</option>
                 </select>
             </div>
         </form>
     </div>
 
-    {{-- TABLE --}}
+    
     <div class="table-container">
         <table class="parkir-table">
             <thead>
@@ -344,89 +344,94 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($transaksis as $trx)
+                <?php $__empty_1 = true; $__currentLoopData = $transaksis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $trx): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr>
-                    <td class="row-id">{{ str_pad($loop->iteration + (($transaksis->currentPage() - 1) * $transaksis->perPage()), 3, '0', STR_PAD_LEFT) }}</td>
-                    <td>{{ \Carbon\Carbon::parse($trx->waktu_masuk)->format('d M') }}</td>
-                    <td><span class="plat-text">{{ $trx->kendaraan->plat_nomor ?? '-' }}</span></td>
+                    <td class="row-id"><?php echo e(str_pad($loop->iteration + (($transaksis->currentPage() - 1) * $transaksis->perPage()), 3, '0', STR_PAD_LEFT)); ?></td>
+                    <td><?php echo e(\Carbon\Carbon::parse($trx->waktu_masuk)->format('d M')); ?></td>
+                    <td><span class="plat-text"><?php echo e($trx->kendaraan->plat_nomor ?? '-'); ?></span></td>
                     <td>
-                        <span class="jenis-text {{ strtolower($trx->kendaraan->jenis ?? 'motor') }}">
-                            {{ ucfirst($trx->kendaraan->jenis ?? '-') }}
+                        <span class="jenis-text <?php echo e(strtolower($trx->kendaraan->jenis ?? 'motor')); ?>">
+                            <?php echo e(ucfirst($trx->kendaraan->jenis ?? '-')); ?>
+
                         </span>
                     </td>
-                    <td>{{ $trx->area->nama_area ?? '-' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($trx->waktu_masuk)->format('H:i') }}</td>
+                    <td><?php echo e($trx->area->nama_area ?? '-'); ?></td>
+                    <td><?php echo e(\Carbon\Carbon::parse($trx->waktu_masuk)->format('H:i')); ?></td>
                     <td>
-                        @if ($trx->waktu_keluar)
-                            {{ \Carbon\Carbon::parse($trx->waktu_keluar)->format('H:i') }}
-                        @else
+                        <?php if($trx->waktu_keluar): ?>
+                            <?php echo e(\Carbon\Carbon::parse($trx->waktu_keluar)->format('H:i')); ?>
+
+                        <?php else: ?>
                             <span style="color:#ccc;">–</span>
-                        @endif
+                        <?php endif; ?>
                     </td>
                     <td>
-                        @if ($trx->waktu_keluar)
-                            {{ $trx->durasi_menit ?? 0 }} mnt
-                        @else
-                            {{ \Carbon\Carbon::parse($trx->waktu_masuk)->diffInMinutes(now()) }} mnt
-                        @endif
+                        <?php if($trx->waktu_keluar): ?>
+                            <?php echo e($trx->durasi_menit ?? 0); ?> mnt
+                        <?php else: ?>
+                            <?php echo e(\Carbon\Carbon::parse($trx->waktu_masuk)->diffInMinutes(now())); ?> mnt
+                        <?php endif; ?>
                     </td>
-                    <td><span class="tarif-text">Rp {{ number_format($trx->tarif_akhir ?? 0, 0, ',', '.') }}</span></td>
+                    <td><span class="tarif-text">Rp <?php echo e(number_format($trx->tarif_akhir ?? 0, 0, ',', '.')); ?></span></td>
                     <td>
-                        <span class="status-badge {{ $trx->status }}">
-                            {{ ucfirst($trx->status) }}
+                        <span class="status-badge <?php echo e($trx->status); ?>">
+                            <?php echo e(ucfirst($trx->status)); ?>
+
                         </span>
                     </td>
                     <td>
-                        @if ($trx->status === 'selesai')
-                            <a href="{{ route('petugas.riwayat-transaksi.struk', $trx->id) }}" class="aksi-btn">Struk</a>
-                        @else
-                            <a href="{{ route('petugas.transaksi.keluar', $trx->id) }}" class="aksi-btn keluar">Keluar</a>
-                        @endif
+                        <?php if($trx->status === 'selesai'): ?>
+                            <a href="<?php echo e(route('petugas.riwayat-transaksi.struk', $trx->id)); ?>" class="aksi-btn">Struk</a>
+                        <?php else: ?>
+                            <a href="<?php echo e(route('petugas.transaksi.keluar', $trx->id)); ?>" class="aksi-btn keluar">Keluar</a>
+                        <?php endif; ?>
                     </td>
                 </tr>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan="10" class="empty-state">Tidak ada data transaksi ditemukan.</td>
                 </tr>
-                @endforelse
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 
-    {{-- PAGINATION --}}
-    @if ($transaksis->hasPages())
+    
+    <?php if($transaksis->hasPages()): ?>
     <div class="pagination-wrapper">
-        {{-- Previous --}}
-        @if ($transaksis->onFirstPage())
+        
+        <?php if($transaksis->onFirstPage()): ?>
             <span class="page-link disabled">
                 <i class="fa-solid fa-chevron-left"></i>
             </span>
-        @else
-            <a href="{{ $transaksis->previousPageUrl() }}&{{ http_build_query(request()->except('page')) }}" class="page-link">
+        <?php else: ?>
+            <a href="<?php echo e($transaksis->previousPageUrl()); ?>&<?php echo e(http_build_query(request()->except('page'))); ?>" class="page-link">
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
-        @endif
+        <?php endif; ?>
 
-        {{-- Page Numbers --}}
-        @foreach ($transaksis->getUrlRange(1, $transaksis->lastPage()) as $page => $url)
-            <a href="{{ $url }}&{{ http_build_query(request()->except('page')) }}"
-               class="page-link {{ $page == $transaksis->currentPage() ? 'active' : '' }}">
-                {{ $page }}
+        
+        <?php $__currentLoopData = $transaksis->getUrlRange(1, $transaksis->lastPage()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $page => $url): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <a href="<?php echo e($url); ?>&<?php echo e(http_build_query(request()->except('page'))); ?>"
+               class="page-link <?php echo e($page == $transaksis->currentPage() ? 'active' : ''); ?>">
+                <?php echo e($page); ?>
+
             </a>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-        {{-- Next --}}
-        @if ($transaksis->hasMorePages())
-            <a href="{{ $transaksis->nextPageUrl() }}&{{ http_build_query(request()->except('page')) }}" class="page-link">
+        
+        <?php if($transaksis->hasMorePages()): ?>
+            <a href="<?php echo e($transaksis->nextPageUrl()); ?>&<?php echo e(http_build_query(request()->except('page'))); ?>" class="page-link">
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
-        @else
+        <?php else: ?>
             <span class="page-link disabled">
                 <i class="fa-solid fa-chevron-right"></i>
             </span>
-        @endif
+        <?php endif; ?>
     </div>
-    @endif
+    <?php endif; ?>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DELL LATITUDE 3301\parkir-app\resources\views/petugas/riwayat-transaksi.blade.php ENDPATH**/ ?>

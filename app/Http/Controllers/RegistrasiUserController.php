@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\LogAktivitas;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class RegistrasiUserController extends Controller
 {
@@ -36,6 +38,14 @@ class RegistrasiUserController extends Controller
             'penempatan' => $request->penempatan,
             'role' => $request->role,
             'status' => 'aktif', // default aktif
+        ]);
+        
+        // Log activity
+        $user = Auth::user();
+        LogAktivitas::create([
+            'user_id' => $user->id,
+            'aktivitas' => "Tambah user {$request->name} ({$request->role})",
+            'lokasi' => $request->penempatan,
         ]);
 
         return back()->with('success', 'User berhasil ditambahkan.');
@@ -68,6 +78,14 @@ class RegistrasiUserController extends Controller
         }
 
         $user->update($data);
+        
+        // Log activity
+        $currentUser = Auth::user();
+        LogAktivitas::create([
+            'user_id' => $currentUser->id,
+            'aktivitas' => "Update user {$request->name} ({$request->role})",
+            'lokasi' => $request->penempatan,
+        ]);
 
         return back()->with('success', 'User berhasil diupdate.');
     }
@@ -76,7 +94,18 @@ class RegistrasiUserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+        $userName = $user->name;
+        $userRole = $user->role;
+        $userPenempatan = $user->penempatan;
         $user->delete();
+        
+        // Log activity
+        $currentUser = Auth::user();
+        LogAktivitas::create([
+            'user_id' => $currentUser->id,
+            'aktivitas' => "Hapus user {$userName} ({$userRole})",
+            'lokasi' => $userPenempatan,
+        ]);
 
         return back()->with('success', 'User berhasil dihapus.');
     }

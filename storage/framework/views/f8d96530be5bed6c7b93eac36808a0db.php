@@ -1,13 +1,13 @@
-@extends('layouts.app')
 
-@section('title', 'Dashboard Petugas')
-@section('page-title', 'Dashboard Petugas:')
 
-@section('sidebar')
-    @include('components.sidebar.petugas')
-@endsection
+<?php $__env->startSection('title', 'Dashboard Petugas'); ?>
+<?php $__env->startSection('page-title', 'Dashboard Petugas:'); ?>
 
-@section('content')
+<?php $__env->startSection('sidebar'); ?>
+    <?php echo $__env->make('components.sidebar.petugas', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
 
 <style>
     /* ===== TOP HEADER ===== */
@@ -233,42 +233,42 @@
     }
 </style>
 
-{{-- TOP HEADER --}}
+
 <div class="top-header">
     <span></span>
     <span class="petugas-panel-badge">PETUGAS PANEL</span>
 </div>
 
-{{-- GREETING --}}
+
 <div class="greeting">
-    <h1>Selamat Bertugas, {{ auth()->user()->name ?? 'Petugas' }}</h1>
+    <h1>Selamat Bertugas, <?php echo e(auth()->user()->name ?? 'Petugas'); ?></h1>
 </div>
 
-{{-- STATS --}}
+
 <div class="stats-grid">
-    {{-- Kendaraan Masuk --}}
+    
     <div class="stat-card">
         <div class="stat-icon-box">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F8C61E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
             </svg>
         </div>
-        <div class="stat-value">{{ $kendaraanMasuk ?? 0 }}</div>
+        <div class="stat-value"><?php echo e($kendaraanMasuk ?? 0); ?></div>
         <div class="stat-label">Kendaraan Masuk Hari Ini</div>
     </div>
 
-    {{-- Kendaraan Keluar --}}
+    
     <div class="stat-card">
         <div class="stat-icon-box">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F8C61E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
             </svg>
         </div>
-        <div class="stat-value">{{ $kendaraanKeluar ?? 0 }}</div>
+        <div class="stat-value"><?php echo e($kendaraanKeluar ?? 0); ?></div>
         <div class="stat-label">Kendaraan Keluar Hari Ini</div>
     </div>
 
-    {{-- Kendaraan Parkir Sekarang --}}
+    
     <div class="stat-card">
         <div class="stat-icon-box">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F8C61E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -277,14 +277,14 @@
                 <circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/>
             </svg>
         </div>
-        <div class="stat-value">{{ $kendaraanParkir ?? 0 }}</div>
+        <div class="stat-value"><?php echo e($kendaraanParkir ?? 0); ?></div>
         <div class="stat-label">Kendaraan Parkir Sekarang</div>
     </div>
 </div>
 
-{{-- TRANSAKSI TERAKHIR --}}
+
 <div class="section-title">Transaksi Terakhir</div>
-<div class="section-sub">{{ $jumlahTransaksiBaru ?? 0 }} transaksi baru</div>
+<div class="section-sub"><?php echo e($jumlahTransaksiBaru ?? 0); ?> transaksi baru</div>
 <div class="transaksi-card">
     <table class="transaksi-table">
         <thead>
@@ -297,45 +297,47 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($transaksiTerakhir as $t)
+            <?php $__empty_1 = true; $__currentLoopData = $transaksiTerakhir; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr>
-                    <td><span class="plat-text">{{ $t->no_plat }}</span></td>
+                    <td><span class="plat-text"><?php echo e($t->no_plat); ?></span></td>
                     <td>
-                        <span class="jenis-text {{ strtolower($t->jenis_kendaraan) }}">
-                            {{ ucfirst($t->jenis_kendaraan) }}
+                        <span class="jenis-text <?php echo e(strtolower($t->jenis_kendaraan)); ?>">
+                            <?php echo e(ucfirst($t->jenis_kendaraan)); ?>
+
                         </span>
                     </td>
-                    <td>{{ \Carbon\Carbon::parse($t->waktu_masuk)->format('d M H:i') }}</td>
+                    <td><?php echo e(\Carbon\Carbon::parse($t->waktu_masuk)->format('d M H:i')); ?></td>
                     <td>
-                        <span class="status-badge {{ $t->status === 'parkir' ? 'parkir' : 'selesai' }}">
-                            {{ ucfirst($t->status) }}
+                        <span class="status-badge <?php echo e($t->status === 'parkir' ? 'parkir' : 'selesai'); ?>">
+                            <?php echo e(ucfirst($t->status)); ?>
+
                         </span>
                     </td>
                     <td>
-                        @if ($t->status === 'parkir')
-                            <a href="{{ route('petugas.transaksi.keluar', $t->id) }}" class="aksi-btn keluar">Keluar</a>
-                        @else
-                            <a href="{{ route('petugas.transaksi.struk', $t->id) }}" class="aksi-btn struk">Struk</a>
-                        @endif
+                        <?php if($t->status === 'parkir'): ?>
+                            <a href="<?php echo e(route('petugas.transaksi.keluar', $t->id)); ?>" class="aksi-btn keluar">Keluar</a>
+                        <?php else: ?>
+                            <a href="<?php echo e(route('petugas.transaksi.struk', $t->id)); ?>" class="aksi-btn struk">Struk</a>
+                        <?php endif; ?>
                     </td>
                 </tr>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan="5" style="text-align:center; color:#bbb; padding: 32px 20px; font-size:13px;">
                         Belum ada transaksi hari ini.
                     </td>
                 </tr>
-            @endforelse
+            <?php endif; ?>
         </tbody>
     </table>
 </div>
 
-{{-- STATUS AREA --}}
+
 <div class="section-title">Status Area</div>
 <div class="section-sub">Status Real-time Hari Ini</div>
 <div class="status-area-card">
-    @forelse ($statusArea as $area)
-        @php
+    <?php $__empty_1 = true; $__currentLoopData = $statusArea; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $area): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+        <?php
             $pct = $area['kapasitas'] > 0
                 ? round(($area['terisi'] / $area['kapasitas']) * 100)
                 : 0;
@@ -345,24 +347,25 @@
             else                 $barClass = 'grey';
 
             $badgeClass = ($pct === 0) ? 'yellow' : 'dark';
-        @endphp
+        ?>
         <div class="area-item">
             <div class="area-item-top">
-                <span class="area-item-name">{{ $area['nama'] }}</span>
-                <span class="area-pct-badge {{ $badgeClass }}">{{ $pct }}%</span>
+                <span class="area-item-name"><?php echo e($area['nama']); ?></span>
+                <span class="area-pct-badge <?php echo e($badgeClass); ?>"><?php echo e($pct); ?>%</span>
             </div>
             <div class="area-bar-bg">
-                <div class="area-bar-fill {{ $barClass }}"style="width: {{ $pct . '%' }}""></div>
+                <div class="area-bar-fill <?php echo e($barClass); ?>"style="width: <?php echo e($pct . '%'); ?>""></div>
             </div>
             <div class="area-slot">
-                @if (!empty($area['keterangan']))
-                    {{ $area['keterangan'] }}
-                @else
-                    {{ $area['terisi'] }}/{{ $area['kapasitas'] }} slot
-                @endif
+                <?php if(!empty($area['keterangan'])): ?>
+                    <?php echo e($area['keterangan']); ?>
+
+                <?php else: ?>
+                    <?php echo e($area['terisi']); ?>/<?php echo e($area['kapasitas']); ?> slot
+                <?php endif; ?>
             </div>
         </div>
-    @empty
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <div class="area-item">
             <div class="area-item-top">
                 <span class="area-item-name">Belum ada data area</span>
@@ -371,16 +374,16 @@
             <div class="area-bar-bg"><div class="area-bar-fill grey" style="width:0%"></div></div>
             <div class="area-slot">Hubungi admin untuk mengatur area parkir.</div>
         </div>
-    @endforelse
+    <?php endif; ?>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
 <script>
 (function() {
     'use strict';
 
-    const API_URL = '{{ route("petugas.api.status-area") }}';
+    const API_URL = '<?php echo e(route("petugas.api.status-area")); ?>';
     const UPDATE_INTERVAL = 10000; // 10 detik
 
     // Inisialisasi saat DOM siap
@@ -459,3 +462,4 @@
 
 })();
 </script>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DELL LATITUDE 3301\parkir-app\resources\views/petugas/dashboard.blade.php ENDPATH**/ ?>

@@ -421,7 +421,17 @@
             @csrf
             <input type="hidden" name="_method" id="formMethod" value="POST">
 
-            <div class="modal-field">
+            <!-- Info Sepeda -->
+            <div id="infoPendaftaranSepeda" style="display: none; background-color: #e8f4f8; border-left: 4px solid #0088cc; padding: 12px 15px; margin-bottom: 15px; border-radius: 4px;">
+                <p style="margin: 0; color: #0088cc; font-size: 14px; font-weight: 500;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-right: 8px; vertical-align: text-bottom;">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    Kode akan di-generate otomatis (SPD001, SPD002, dst)
+                </p>
+            </div>
+
+            <div class="modal-field" id="fieldPlat">
                 <label>PLAT NOMOR</label>
                 <input type="text" name="plat_nomor" id="inputPlat" placeholder="Contoh: N 1234 AB" required>
             </div>
@@ -429,7 +439,7 @@
             <div class="modal-row">
                 <div class="modal-field">
                     <label>JENIS</label>
-                    <select name="jenis" id="inputJenis" required>
+                    <select name="jenis" id="inputJenis" required onchange="handleJenisChange()">
                         <option value="" disabled selected>Pilih jenis</option>
                         @foreach($tarifParkirs ?? [] as $tarif)
                             <option value="{{ $tarif->jenis_kendaraan }}">{{ $tarif->jenis_kendaraan }}</option>
@@ -467,12 +477,43 @@
 <script>
     let editingId = null;
 
+    function handleJenisChange() {
+        const jenisSelect = document.getElementById('inputJenis');
+        const jenis = jenisSelect.value;
+        const isSepeda = jenis && jenis.toLowerCase() === 'sepeda';
+        
+        const fieldPlat = document.getElementById('fieldPlat');
+        const inputPlat = document.getElementById('inputPlat');
+        const infoPendaftaranSepeda = document.getElementById('infoPendaftaranSepeda');
+        
+        if (isSepeda) {
+            // Sembunyikan field plat nomor untuk sepeda
+            fieldPlat.style.display = 'none';
+            inputPlat.required = false;
+            inputPlat.value = '';
+            
+            // Tampilkan informasi bahwa kode akan di-generate otomatis
+            infoPendaftaranSepeda.style.display = 'block';
+        } else {
+            // Tampilkan field plat nomor untuk jenis lain
+            fieldPlat.style.display = 'block';
+            inputPlat.required = true;
+            infoPendaftaranSepeda.style.display = 'none';
+        }
+    }
+
     function bukaModal() {
         editingId = null;
         document.getElementById('modalTitle').textContent = 'Tambah Kendaraan';
         document.getElementById('kendaraanForm').action = '{{ route("admin.kendaraan.store") }}';
         document.getElementById('formMethod').value = 'POST';
         document.getElementById('kendaraanForm').reset();
+        
+        // Reset field visibility
+        document.getElementById('fieldPlat').style.display = 'block';
+        document.getElementById('inputPlat').required = true;
+        document.getElementById('infoPendaftaranSepeda').style.display = 'none';
+        
         document.getElementById('modalTambahKendaraan').classList.add('active');
     }
 
@@ -496,6 +537,32 @@
         document.getElementById('inputWarna').value = warna;
         document.getElementById('inputPemilik').value = pemilik;
         document.getElementById('inputGambar').value = '';
+
+        // Handle sepeda - lock plat field
+        const isSepeda = jenis && jenis.toLowerCase() === 'sepeda';
+        const fieldPlat = document.getElementById('fieldPlat');
+        const infoPendaftaranSepeda = document.getElementById('infoPendaftaranSepeda');
+        
+        if (isSepeda) {
+            fieldPlat.style.display = 'none';
+            document.getElementById('inputPlat').required = false;
+            infoPendaftaranSepeda.style.display = 'block';
+            
+            // Untuk sepeda saat edit, tampilkan pesan bahwa kode tidak bisa diubah
+            const msg = document.createElement('div');
+            msg.style.cssText = 'background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 13px; color: #856404;';
+            msg.innerHTML = '<strong>Catatan:</strong> Kode sepeda (SPD) tidak dapat diubah setelah pendaftaran.';
+            
+            const form = document.getElementById('kendaraanForm');
+            const infoDiv = form.querySelector('[style*="e8f4f8"]');
+            if (infoDiv && infoDiv.nextElementSibling !== msg) {
+                infoDiv.parentNode.insertBefore(msg, infoDiv.nextElementSibling);
+            }
+        } else {
+            fieldPlat.style.display = 'block';
+            document.getElementById('inputPlat').required = true;
+            infoPendaftaranSepeda.style.display = 'none';
+        }
 
         // Reset preview
         const previewDiv = document.getElementById('gambarPreview');
@@ -528,6 +595,9 @@
             previewImg.src = '{{ asset("storage/") }}/' + data.gambar;
             previewDiv.style.display = 'block';
         }
+        
+        // Trigger handleJenisChange untuk consistency
+        handleJenisChange();
     }
 
     function previewGambar(input) {

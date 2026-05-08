@@ -56,17 +56,24 @@
         padding: 10px 18px;
         flex: 1;
         max-width: 340px;
+        transition: all 0.2s;
+    }
+
+    .search-box:focus-within {
+        border-color: #F8C61E;
+        box-shadow: 0 0 0 3px rgba(248,198,30,0.1);
     }
 
     .search-box input {
         border: none;
         outline: none;
         font-size: 13px;
-        color: #aaa;
+        color: #1a1a1a;
         background: transparent;
         width: 100%;
     }
 
+    .search-box input::placeholder { color: #bbb; }
     .search-box svg { flex-shrink: 0; }
 
     .btn-export {
@@ -81,17 +88,22 @@
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: background 0.15s;
+        transition: all 0.2s;
     }
 
-    .btn-export:hover { background: #333; }
+    .btn-export:hover { 
+        background: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
 
     /* TABLE CARD */
     .table-card {
         background: #fff;
         border-radius: 16px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         overflow: hidden;
+        border: 1px solid #f0ede8;
     }
 
     .table-card table {
@@ -100,30 +112,35 @@
     }
 
     .table-card thead tr {
-        background: #1C1C1E;
+        background: linear-gradient(135deg, #1C1C1E 0%, #2a2a2d 100%);
     }
 
     .table-card thead th {
-        padding: 14px 20px;
+        padding: 16px 20px;
         font-size: 11px;
         font-weight: 700;
         color: #fff;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
         text-align: left;
+        text-transform: uppercase;
     }
 
     .table-card tbody tr {
-        border-bottom: 1px solid #f0ede8;
-        transition: background 0.12s;
+        border-bottom: 1px solid #f5f2ed;
+        transition: all 0.12s;
     }
 
     .table-card tbody tr:last-child { border-bottom: none; }
-    .table-card tbody tr:hover { background: #fafaf8; }
+    .table-card tbody tr:hover { 
+        background: #fafaf8;
+        box-shadow: inset 0 0 0 1px #f0ede8;
+    }
 
     .table-card tbody td {
         padding: 16px 20px;
         font-size: 13px;
-        color: #666;
+        color: #555;
+        vertical-align: middle;
     }
 
     .td-num {
@@ -135,43 +152,118 @@
     .td-user {
         font-weight: 700;
         color: #1a1a1a;
+        font-size: 14px;
     }
 
     .td-waktu {
-        color: #aaa;
+        color: #999;
         font-size: 12px;
+        font-weight: 500;
     }
 
     .td-lokasi {
-        color: #aaa;
+        color: #888;
+        font-size: 12px;
+        max-width: 250px;
     }
 
     .td-aktivitas {
-        color: #999;
+        color: #666;
         font-size: 12px;
+        max-width: 300px;
     }
 
+    /* ROLE BADGES */
     .role-badge {
         display: inline-block;
         font-size: 11px;
-        font-weight: 600;
-        padding: 3px 12px;
+        font-weight: 700;
+        padding: 5px 12px;
         border-radius: 20px;
-        border: 1.5px solid #d0ccc4;
-        color: #555;
-        background: #fff;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
     }
 
     .role-badge.admin {
-        border-color: #e8c84a;
-        color: #a07c00;
-        background: rgba(248,198,30,0.10);
+        background: linear-gradient(135deg, rgba(255,152,0,0.1), rgba(255,193,7,0.1));
+        color: #e67e22;
+        border: 1.5px solid #ffe0b2;
+    }
+
+    .role-badge.petugas {
+        background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(96,165,250,0.1));
+        color: #3b82f6;
+        border: 1.5px solid #bfdbfe;
     }
 
     .role-badge.owner {
-        border-color: #1C1C1E;
-        color: #1a1a1a;
-        background: rgba(28,28,30,0.08);
+        background: linear-gradient(135deg, rgba(76,175,125,0.1), rgba(129,199,132,0.1));
+        color: #2e7d32;
+        border: 1.5px solid #c8e6c9;
+    }
+
+    /* STATUS BADGES */
+    .status-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 20px;
+        letter-spacing: 0.3px;
+    }
+
+    .status-badge.aktif {
+        background: linear-gradient(135deg, rgba(76,175,125,0.15), rgba(129,199,132,0.15));
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+
+    .status-badge.draft {
+        background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,213,79,0.15));
+        color: #f57f17;
+        border: 1px solid #ffe082;
+    }
+
+    /* ACTION LINKS */
+    .td-aksi {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: none;
+        font-family: inherit;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-action.edit {
+        color: #3b82f6;
+        background: rgba(59,130,246,0.08);
+    }
+
+    .btn-action.edit:hover {
+        background: rgba(59,130,246,0.15);
+        transform: translateX(2px);
+    }
+
+    .btn-action.delete {
+        color: #ef4444;
+        background: rgba(239,68,68,0.08);
+    }
+
+    .btn-action.delete:hover {
+        background: rgba(239,68,68,0.15);
+        transform: translateX(-2px);
     }
 
     @media (max-width: 768px) {
@@ -180,6 +272,7 @@
         .table-card { overflow-x: auto; }
     }
 </style>
+    
 
 <div class="top-header">
     <span></span>
@@ -229,20 +322,20 @@
                     <td class="td-lokasi">{{ $log->lokasi ?? '-' }}</td>
                     <td>
                         <span class="role-badge {{ strtolower($log->user->role ?? '') }}">
-                            {{ ucfirst($log->user->role ?? '-') }}
+                            {{ strtolower($log->user->role ?? '-') }}
                         </span>
                     </td>
                     <td class="td-aktivitas">{{ $log->aktivitas }}</td>
                 </tr>
             @empty
-                {{-- DUMMY DATA --}}
+                {{-- DUMMY DATA DENGAN LOKASI REAL --}}
                 @php
                     $dummy = [
-                        ['no' => 1, 'waktu' => '09 Apr 14:32', 'user' => 'Aqela',  'lokasi' => 'MOG',   'role' => 'Petugas', 'aktivitas' => 'Login ke sistem'],
-                        ['no' => 2, 'waktu' => '09 Apr 14.28', 'user' => 'Qela',   'lokasi' => '-',     'role' => 'Admin',   'aktivitas' => 'Tambah tarif Bus-Rp 5.000/jam'],
-                        ['no' => 3, 'waktu' => '09 Apr 14.20', 'user' => 'Qey',    'lokasi' => 'Matos', 'role' => 'Petugas', 'aktivitas' => 'Login ke sistem'],
-                        ['no' => 4, 'waktu' => '09 Apr 14.15', 'user' => 'Nisa',   'lokasi' => '-',     'role' => 'Admin',   'aktivitas' => 'Update kapasitas Matos'],
-                        ['no' => 5, 'waktu' => '09 Apr 13.58', 'user' => 'Niisaa', 'lokasi' => 'Plaza', 'role' => 'Petugas', 'aktivitas' => 'Logout dari sistem'],
+                        ['no' => 1, 'waktu' => '09 Apr 14:32', 'user' => 'Aqela',  'lokasi' => 'Jl. Kawi No.24, Klojen',          'role' => 'petugas', 'aktivitas' => 'Login ke sistem'],
+                        ['no' => 2, 'waktu' => '09 Apr 14:28', 'user' => 'Qela',   'lokasi' => '-',                             'role' => 'admin',   'aktivitas' => 'Tambah tarif Bus - Rp 5.000/jam'],
+                        ['no' => 3, 'waktu' => '09 Apr 14:20', 'user' => 'Qey',    'lokasi' => 'Jl. Veteran No.2, Lowokwaru',   'role' => 'petugas', 'aktivitas' => 'Login ke sistem'],
+                        ['no' => 4, 'waktu' => '09 Apr 14:15', 'user' => 'Nisa',   'lokasi' => '-',                             'role' => 'admin',   'aktivitas' => 'Update area - Kapasitas: 600, Status: aktif'],
+                        ['no' => 5, 'waktu' => '09 Apr 13:58', 'user' => 'Niisaa', 'lokasi' => 'Jl. KH Agus Salim 18, Sukoharjo', 'role' => 'owner',   'aktivitas' => 'Logout dari sistem'],
                     ];
                 @endphp
                 @foreach($dummy as $row)
@@ -252,7 +345,7 @@
                         <td class="td-user">{{ $row['user'] }}</td>
                         <td class="td-lokasi">{{ $row['lokasi'] }}</td>
                         <td>
-                            <span class="role-badge {{ strtolower($row['role']) }}">
+                            <span class="role-badge {{ $row['role'] }}">
                                 {{ $row['role'] }}
                             </span>
                         </td>

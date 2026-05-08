@@ -32,6 +32,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
                 $area->terisi = $terisi;
                 return $area;
             }),
+            'logAktivitas' => \App\Models\LogAktivitas::with('user')
+                ->where('created_at', '>=', now()->subHour())
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get(),
         ]);
     })->name('dashboard');
 
@@ -58,19 +63,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/area-parkir',             [AreaParkirController::class, 'store'])->name('area-parkir.store');
     Route::put('/area-parkir/{id}',         [AreaParkirController::class, 'update'])->name('area-parkir.update');
     Route::delete('/area-parkir/{id}',      [AreaParkirController::class, 'destroy'])->name('area-parkir.destroy');
+    Route::get('/api/area-parkir',          [AreaParkirController::class, 'apiGetAreas'])->name('api.area-parkir');
 
     Route::get('/log-aktivitas', [\App\Http\Controllers\AdminController::class, 'logAktivitas'])->name('log-aktivitas');
-    Route::get('/api/status-area', function () {
-        return \App\Models\AreaParkir::where('status', 'aktif')->get()->map(function ($area) {
-            $terisi = \App\Models\Transaksi::where('area_id', $area->id)->where('status', 'parkir')->count();
-            return [
-                'nama' => $area->nama_area,
-                'alamat' => $area->lokasi,
-                'kapasitas' => $area->kapasitas,
-                'terisi' => $terisi,
-            ];
-        });
-    })->name('api.status-area');
+    Route::get('/api/status-area', [\App\Http\Controllers\AdminController::class, 'getStatusArea'])->name('api.status-area');
 });
 
 // PETUGAS

@@ -1,4 +1,4 @@
-{{-- components/sidebar/admin.blade.php --}}
+
 
 <style>
     .sidebar {
@@ -33,9 +33,9 @@
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 1.2px;
-        border: 1.5px solid #F8C61E;
-        color: #F8C61E;
-        background: rgba(248,198,30,0.08);
+        border: 1.5px solid #4a9eff;
+        color: #4a9eff;
+        background: rgba(74,158,255,0.08);
     }
 
     .sidebar-divider { height: 1px; background: #2a2a2a; }
@@ -86,36 +86,28 @@
 <aside class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">
-            <img src="{{ asset('assets/images/ParkSys.png') }}" alt="ParkSys Logo">
+            <img src="<?php echo e(asset('assets/images/ParkSys.png')); ?>" alt="ParkSys Logo">
         </div>
-        <span class="role-badge">ADMIN</span>
+        <span class="role-badge">PETUGAS</span>
     </div>
 
     <div class="sidebar-divider"></div>
 
     <nav class="sidebar-nav">
-        <span class="nav-section-label">Overview</span>
-        <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+        <span class="nav-section-label">Menu Utama</span>
+        <a href="<?php echo e(route('petugas.dashboard')); ?>" class="nav-item <?php echo e(request()->routeIs('petugas.dashboard') ? 'active' : ''); ?>">
             <i class="fa-solid fa-border-all"></i> Dashboard
         </a>
-
-        <span class="nav-section-label">Master Data</span>
-        <a href="{{ route('admin.tarif-parkir') }}" class="nav-item {{ request()->routeIs('admin.tarif-parkir*') ? 'active' : '' }}">
-            <i class="fa-regular fa-clock"></i> Tarif Parkir
+        <a href="<?php echo e(route('petugas.transaksi.index')); ?>" class="nav-item <?php echo e(request()->routeIs('petugas.transaksi*') ? 'active' : ''); ?>">
+            <i class="fa-regular fa-pen-to-square"></i> Transaksi Parkir
         </a>
-        <a href="{{ route('admin.area-parkir') }}" class="nav-item {{ request()->routeIs('admin.area-parkir*') ? 'active' : '' }}">
-            <i class="fa-solid fa-location-dot"></i> Area Parkir
-        </a>
-        <a href="{{ route('admin.kendaraan') }}" class="nav-item {{ request()->routeIs('admin.kendaraan*') ? 'active' : '' }}">
-            <i class="fa-solid fa-car"></i> Kendaraan
+        <a href="<?php echo e(route('petugas.riwayat-transaksi')); ?>" class="nav-item <?php echo e(request()->routeIs('petugas.riwayat-transaksi*') ? 'active' : ''); ?>">
+            <i class="fa-regular fa-clock"></i> Riwayat Transaksi
         </a>
 
-        <span class="nav-section-label">User Management</span>
-        <a href="{{ route('admin.registrasi-user') }}" class="nav-item {{ request()->routeIs('admin.registrasi-user*') ? 'active' : '' }}">
-            <i class="fa-regular fa-user"></i> Registrasi User
-        </a>
-        <a href="{{ route('admin.log-aktivitas') }}" class="nav-item {{ request()->routeIs('admin.log-aktivitas*') ? 'active' : '' }}">
-            <i class="fa-regular fa-file-lines"></i> Log Aktivitas
+        <span class="nav-section-label">Lainnya</span>
+        <a href="<?php echo e(route('petugas.status-area')); ?>" class="nav-item <?php echo e(request()->routeIs('petugas.status-area*') ? 'active' : ''); ?>">
+            <i class="fa-regular fa-building"></i> Status Area
         </a>
     </nav>
-</aside>
+</aside><?php /**PATH C:\Users\DELL LATITUDE 3301\parkir-app\resources\views/components/sidebar/petugas.blade.php ENDPATH**/ ?>

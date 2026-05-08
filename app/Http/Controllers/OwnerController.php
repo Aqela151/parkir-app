@@ -14,14 +14,14 @@ class OwnerController extends Controller
 {
     public function dashboard()
     {
-        // Pendapatan hari ini
-        $pendapatanHariIni = Transaksi::whereDate('waktu_masuk', today())
+        // Pendapatan hari ini (berdasarkan waktu_keluar, hanya transaksi selesai)
+        $pendapatanHariIni = Transaksi::whereDate('waktu_keluar', today())
             ->whereNotNull('tarif_akhir')
             ->sum('tarif_akhir') ?? 0;
         $pendapatanHariIniFormatted = 'Rp ' . number_format($pendapatanHariIni, 0, ',', '.');
 
         // Trend pendapatan (hari ini vs kemarin)
-        $pendapatanKemarin = Transaksi::whereDate('waktu_masuk', today()->subDay())
+        $pendapatanKemarin = Transaksi::whereDate('waktu_keluar', today()->subDay())
             ->whereNotNull('tarif_akhir')
             ->sum('tarif_akhir') ?? 0;
         $pendapatanTrend = $pendapatanKemarin > 0 ? round((($pendapatanHariIni - $pendapatanKemarin) / $pendapatanKemarin) * 100) : 0;
@@ -30,16 +30,16 @@ class OwnerController extends Controller
         $transaksiHariIni = Transaksi::whereDate('waktu_masuk', today())->count();
         $lokasiAktif = AreaParkir::where('status', 'aktif')->count() . ' lokasi';
 
-        // Pendapatan bulan ini
-        $pendapatanBulanIni = Transaksi::whereMonth('waktu_masuk', date('m'))
-            ->whereYear('waktu_masuk', date('Y'))
+        // Pendapatan bulan ini (berdasarkan waktu_keluar)
+        $pendapatanBulanIni = Transaksi::whereMonth('waktu_keluar', date('m'))
+            ->whereYear('waktu_keluar', date('Y'))
             ->whereNotNull('tarif_akhir')
             ->sum('tarif_akhir') ?? 0;
         $pendapatanBulanIniFormatted = 'Rp ' . number_format($pendapatanBulanIni, 0, ',', '.');
 
-        // Trend bulan ini vs bulan lalu
-        $pendapatanBulanLalu = Transaksi::whereMonth('waktu_masuk', date('m') - 1)
-            ->whereYear('waktu_masuk', date('Y'))
+        // Trend bulan ini vs bulan lalu (berdasarkan waktu_keluar)
+        $pendapatanBulanLalu = Transaksi::whereMonth('waktu_keluar', date('m') - 1)
+            ->whereYear('waktu_keluar', date('Y'))
             ->whereNotNull('tarif_akhir')
             ->sum('tarif_akhir') ?? 0;
         $pendapatanBulanTrend = $pendapatanBulanLalu > 0 ? round((($pendapatanBulanIni - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100) : 0;
@@ -55,18 +55,18 @@ class OwnerController extends Controller
             $kapasitasRataRata = $totalKapasitas > 0 ? round(($totalTerisi / $totalKapasitas) * 100) : 0;
         }
 
-        // Chart harian (7 hari terakhir)
+        // Chart harian (7 hari terakhir, berdasarkan waktu_keluar)
         $chartHarian = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = today()->subDays($i);
-            $motor = Transaksi::whereDate('waktu_masuk', $date)
+            $motor = Transaksi::whereDate('waktu_keluar', $date)
                 ->whereHas('kendaraan', function ($q) {
                     $q->where('jenis', 'Motor');
                 })
                 ->whereNotNull('tarif_akhir')
                 ->sum('tarif_akhir') ?? 0;
 
-            $mobil = Transaksi::whereDate('waktu_masuk', $date)
+            $mobil = Transaksi::whereDate('waktu_keluar', $date)
                 ->whereHas('kendaraan', function ($q) {
                     $q->where('jenis', 'Mobil');
                 })
@@ -86,13 +86,14 @@ class OwnerController extends Controller
         // Pendapatan bulan lalu
         $pendapatanBulanLaluFormatted = 'Rp ' . number_format($pendapatanBulanLalu, 0, ',', '.');
 
-        // Pendapatan per area (bulan ini)
+        // Pendapatan per area (bulan ini, berdasarkan waktu_keluar)
         $pendapatanPerArea = AreaParkir::where('area_parkirs.status', 'aktif')
             ->select('area_parkirs.id', 'area_parkirs.nama_area as nama', 'area_parkirs.lokasi as alamat', DB::raw('SUM(COALESCE(t.tarif_akhir, 0)) as pendapatan'))
             ->leftJoin('transaksis as t', function ($join) {
                 $join->on('area_parkirs.id', '=', 't.area_id')
-                     ->whereMonth('t.waktu_masuk', date('m'))
-                     ->whereYear('t.waktu_masuk', date('Y'));
+                     ->whereMonth('t.waktu_keluar', date('m'))
+                     ->whereYear('t.waktu_keluar', date('Y'))
+                     ->whereNotNull('t.tarif_akhir');
             })
             ->groupBy('area_parkirs.id', 'area_parkirs.nama_area', 'area_parkirs.lokasi')
             ->orderByDesc('pendapatan')
@@ -152,14 +153,14 @@ class OwnerController extends Controller
     {
         $areas = AreaParkir::where('status', 'aktif')->get();
 
-        $query = Transaksi::with(['kendaraan', 'area']);
+        $query = Transaksi::with(['kendaraan', 'area'])->whereNotNull('tarif_akhir');
 
         if ($request->filled('dari_tanggal')) {
-            $query->whereDate('waktu_masuk', '>=', $request->dari_tanggal);
+            $query->whereDate('waktu_keluar', '>=', $request->dari_tanggal);
         }
 
         if ($request->filled('sampai_tanggal')) {
-            $query->whereDate('waktu_masuk', '<=', $request->sampai_tanggal);
+            $query->whereDate('waktu_keluar', '<=', $request->sampai_tanggal);
         }
 
         if ($request->filled('lokasi')) {
@@ -199,10 +200,10 @@ class OwnerController extends Controller
                 $query->orderBy('tarif_akhir');
                 break;
             case 'terlama':
-                $query->orderBy('waktu_masuk');
+                $query->orderBy('waktu_keluar');
                 break;
             default:
-                $query->orderByDesc('waktu_masuk');
+                $query->orderByDesc('waktu_keluar');
                 break;
         }
 
@@ -232,11 +233,11 @@ class OwnerController extends Controller
             ->get()
             ->toArray();
 
-        // Data grafik bulanan
+        // Data grafik bulanan (berdasarkan waktu_keluar)
         $grafikBulanan = [];
         for ($bulan = 1; $bulan <= 12; $bulan++) {
-            $query = Transaksi::whereYear('waktu_masuk', $tahun)
-                ->whereMonth('waktu_masuk', $bulan)
+            $query = Transaksi::whereYear('waktu_keluar', $tahun)
+                ->whereMonth('waktu_keluar', $bulan)
                 ->whereNotNull('tarif_akhir');
 
             if ($areaId) {
@@ -261,8 +262,9 @@ class OwnerController extends Controller
         $totalTahun = collect($grafikBulanan)->sum(fn($d) => $d['motor'] + $d['mobil']);
         $totalTahunFormatted = 'Rp ' . number_format($totalTahun, 0, ',', '.');
 
-        // Trend tahunan (vs tahun lalu)
-        $totalTahunLalu = Transaksi::whereYear('waktu_masuk', $tahun - 1)
+        // Trend tahunan (vs tahun lalu, berdasarkan waktu_keluar)
+        $totalTahunLalu = Transaksi::whereYear('waktu_keluar', $tahun - 1)
+            ->whereNotNull('tarif_akhir')
             ->when($areaId, fn($q) => $q->where('area_id', $areaId))
             ->sum('tarif_akhir') ?? 0;
 
@@ -319,7 +321,8 @@ class OwnerController extends Controller
             ->select('nama_area', DB::raw('SUM(COALESCE(t.tarif_akhir, 0)) as total'))
             ->leftJoin('transaksis as t', function ($join) use ($tahun, $areaId) {
                 $join->on('area_parkirs.id', '=', 't.area_id')
-                     ->whereYear('t.waktu_masuk', $tahun);
+                     ->whereYear('t.waktu_keluar', $tahun)
+                     ->whereNotNull('t.tarif_akhir');
                 if ($areaId) {
                     $join->where('t.area_id', $areaId);
                 }
@@ -456,20 +459,22 @@ class OwnerController extends Controller
                         ->count();
 
                     $txBulanIni = (int) Transaksi::where('area_id', $area->id)
-                        ->whereMonth('waktu_masuk', date('m'))
-                        ->whereYear('waktu_masuk', date('Y'))
+                        ->whereMonth('waktu_keluar', date('m'))
+                        ->whereYear('waktu_keluar', date('Y'))
+                        ->whereNotNull('tarif_akhir')
                         ->count();
 
                     $pendapatan = (float)(Transaksi::where('area_id', $area->id)
-                        ->whereMonth('waktu_masuk', date('m'))
-                        ->whereYear('waktu_masuk', date('Y'))
+                        ->whereMonth('waktu_keluar', date('m'))
+                        ->whereYear('waktu_keluar', date('Y'))
                         ->whereNotNull('tarif_akhir')
                         ->sum('tarif_akhir') ?? 0);
 
                     $rataDurasi = (int) round(
                         Transaksi::where('area_id', $area->id)
-                            ->whereMonth('waktu_masuk', date('m'))
-                            ->whereYear('waktu_masuk', date('Y'))
+                            ->whereMonth('waktu_keluar', date('m'))
+                            ->whereYear('waktu_keluar', date('Y'))
+                            ->whereNotNull('tarif_akhir')
                             ->avg('durasi_menit') ?? 0
                     );
 

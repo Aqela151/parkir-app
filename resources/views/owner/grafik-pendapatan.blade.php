@@ -678,15 +678,17 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($detailBulanan ?? [] as $row)
+            @forelse($detailBulanan ?? [] as $i => $row)
                 @php
                     $trendClass = ($row['trend'] ?? 0) > 0 ? 'up' : (($row['trend'] ?? 0) < 0 ? 'down' : 'flat');
                     $trendIcon  = ($row['trend'] ?? 0) > 0 ? '▲' : (($row['trend'] ?? 0) < 0 ? '▼' : '–');
+                    $tahun = $tahun ?? date('Y');
+                    $tanggalBulan = \Carbon\Carbon::createFromDate($tahun, $i + 1, 1)->format('d M Y');
                 @endphp
                 <tr>
                     <td>
                         <span class="month-dot"></span>
-                        {{ $row['bulan'] ?? '-' }}
+                        {{ $tanggalBulan }}
                     </td>
                     <td>{{ $row['motorFormatted'] ?? 'Rp 0' }}</td>
                     <td>{{ $row['mobilFormatted'] ?? 'Rp 0' }}</td>

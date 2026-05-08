@@ -61,12 +61,25 @@
 
     .btn-tambah:hover { opacity: 0.85; }
 
-    table { width: 100%; border-collapse: collapse; }
+    table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        table-layout: auto;
+    }
 
-    thead tr { background: #1C1C1E; }
+    thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    thead tr { 
+        background: linear-gradient(135deg, #1C1C1E 0%, #2a2a2d 100%);
+        border-radius: 12px;
+    }
 
     thead th {
-        padding: 13px 16px;
+        padding: 14px 16px;
         font-size: 11px;
         font-weight: 700;
         color: #fff;
@@ -75,20 +88,37 @@
         text-align: left;
     }
 
-    thead th:first-child { border-radius: 10px 0 0 10px; }
-    thead th:last-child  { border-radius: 0 10px 10px 0; }
+    thead th:first-child { border-radius: 12px 0 0 0; }
+    thead th:last-child { border-radius: 0 12px 0 0; }
 
-    tbody tr { border-bottom: 1px solid #f5f0e8; transition: background 0.15s; }
+    tbody tr { 
+        border-bottom: 1px solid #f5f0e8; 
+        transition: all 0.12s;
+    }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #faf9f7; }
+    tbody tr:hover { 
+        background: #fafaf8;
+        box-shadow: inset 0 0 0 1px #f0ede8;
+    }
 
-    tbody td { padding: 14px 16px; font-size: 13px; color: #aaa; vertical-align: middle; }
+    tbody td { 
+        padding: 14px 16px; 
+        font-size: 13px; 
+        color: #aaa; 
+        vertical-align: middle;
+    }
 
-    .td-no   { color: #ccc; font-size: 12px; width: 40px; }
-    .td-name { font-weight: 700; color: #1a1a1a; }
+    .td-no   { color: #ccc; font-size: 12px; width: 45px; font-weight: 500; }
+    .td-name { font-weight: 700; color: #1a1a1a; font-size: 14px; }
     .td-user { font-weight: 600; color: #555; }
 
-    .badge-role { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-role { 
+        display: inline-block; 
+        padding: 4px 12px; 
+        border-radius: 20px; 
+        font-size: 12px; 
+        font-weight: 700;
+    }
     .badge-admin   { color: #F8C61E; }
     .badge-petugas { color: #4a9eff; }
     .badge-owner   { color: #4caf7d; }
@@ -96,22 +126,34 @@
     .badge-aktif    { color: #4caf7d; font-weight: 700; font-size: 13px; }
     .badge-nonaktif { color: #ff5555; font-weight: 700; font-size: 13px; }
 
-    .aksi-wrap { display: flex; gap: 8px; }
+    .aksi-wrap { 
+        display: flex; 
+        gap: 12px;
+        align-items: center;
+    }
 
     .btn-edit {
-        background: none; border: none;
-        font-size: 12px; font-weight: 700;
+        background: none; 
+        border: none;
+        font-size: 13px; 
+        font-weight: 700;
         font-family: 'Manrope', sans-serif;
-        color: #888; cursor: pointer; padding: 0;
+        color: #888; 
+        cursor: pointer; 
+        padding: 4px 8px;
         transition: color 0.2s;
     }
     .btn-edit:hover { color: #1a1a1a; }
 
     .btn-delete {
-        background: none; border: none;
-        font-size: 12px; font-weight: 700;
+        background: none; 
+        border: none;
+        font-size: 13px; 
+        font-weight: 700;
         font-family: 'Manrope', sans-serif;
-        color: #ffaaaa; cursor: pointer; padding: 0;
+        color: #ffaaaa; 
+        cursor: pointer; 
+        padding: 4px 8px;
         transition: color 0.2s;
     }
     .btn-delete:hover { color: #ff5555; }

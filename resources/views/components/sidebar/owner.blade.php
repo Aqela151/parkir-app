@@ -16,14 +16,15 @@
     .sidebar-header { padding: 28px 24px 20px; }
 
     .sidebar-logo {
-        font-size: 22px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
         margin-bottom: 12px;
     }
 
-    .sidebar-logo .park { color: #ffffff; }
-    .sidebar-logo .sys  { color: #F8C61E; }
+    .sidebar-logo img {
+        width: 100%;
+        height: auto;
+        max-height: 40px;
+        object-fit: contain;
+    }
 
     .role-badge {
         display: inline-block;
@@ -85,7 +86,7 @@
 <aside class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">
-            <span class="park">Park</span><span class="sys">Sys</span>
+            <img src="{{ asset('assets/images/ParkSys.png') }}" alt="ParkSys Logo">
         </div>
         <span class="role-badge">OWNER</span>
     </div>

@@ -155,13 +155,13 @@
     <div class="struk-section">
         <div class="struk-row">
             <span class="struk-label">Masuk</span>
-            <span class="struk-value">{{ $transaksi->waktu_masuk->format('H:i:s') }}</span>
+            <span class="struk-value">{{ $transaksi->waktu_masuk->format('d M Y H:i:s') }}</span>
         </div>
 
         @if ($transaksi->waktu_keluar)
             <div class="struk-row">
                 <span class="struk-label">Keluar</span>
-                <span class="struk-value">{{ $transaksi->waktu_keluar->format('H:i:s') }}</span>
+                <span class="struk-value">{{ $transaksi->waktu_keluar->format('d M Y H:i:s') }}</span>
             </div>
 
             <div class="struk-row">

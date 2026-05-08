@@ -35,7 +35,7 @@ class AuthController extends Controller
             LogAktivitas::create([
                 'user_id' => $user->id,
                 'aktivitas' => 'Login ke sistem',
-                'lokasi' => $user->penempatan,
+                'lokasi' => $user->penempatan ?? '-',
             ]);
 
             return match ($user->role) {
@@ -60,7 +60,7 @@ class AuthController extends Controller
             LogAktivitas::create([
                 'user_id' => $user->id,
                 'aktivitas' => 'Logout dari sistem',
-                'lokasi' => $user->penempatan,
+                'lokasi' => $user->penempatan ?? '-',
             ]);
         }
         

@@ -5,19 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Kendaraan;
 use App\Models\AreaParkir;
 use App\Models\Transaksi;
+use App\Models\LogAktivitas;
+use App\Services\TransaksiService;
+use App\Services\TarifService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class PetugasTransaksiController extends Controller
 {
+    private TransaksiService $transaksiService;
+    private TarifService $tarifService;
+
+    public function __construct(TransaksiService $transaksiService, TarifService $tarifService)
+    {
+        $this->transaksiService = $transaksiService;
+        $this->tarifService = $tarifService;
+    }
+
     /**
      * Display list of transactions (parkir view)
      */
     public function index()
     {
         $kendaraanList = Kendaraan::all();
-        $areaList = AreaParkir::all();
+        $areaList = AreaParkir::where('status', 'aktif')->get();
+        
         $kendaraanParkir = Transaksi::where('status', 'parkir')
             ->with(['kendaraan', 'area'])
             ->orderBy('waktu_masuk', 'desc')
@@ -58,7 +71,7 @@ class PetugasTransaksiController extends Controller
     }
 
     /**
-     * Store new transaction (kendaraan masuk)
+     * Store new transaction (kendaraan masuk) - dengan validasi komprehensif
      */
     public function store(Request $request)
     {
@@ -71,24 +84,33 @@ class PetugasTransaksiController extends Controller
             $kendaraan = Kendaraan::findOrFail($validated['kendaraan_id']);
             $area = AreaParkir::findOrFail($validated['area_id']);
 
-            Transaksi::create([
-                'kendaraan_id' => $validated['kendaraan_id'],
-                'area_id' => $validated['area_id'],
-                'waktu_masuk' => Carbon::now('Asia/Jakarta'),
-                'status' => 'parkir',
-                'tarif_sementara' => 0,
+            // Record entry with comprehensive validation
+            $transaksi = $this->transaksiService->recordEntry(
+                $validated['kendaraan_id'],
+                $validated['area_id']
+            );
+            
+            // Update area occupancy status
+            $area->updateStatusBasedOnOccupancy();
+
+            // Log activity
+            $user = Auth::user();
+            LogAktivitas::create([
+                'user_id' => $user->id,
+                'aktivitas' => "Kendaraan {$kendaraan->plat_nomor} ({$kendaraan->jenis}) masuk parkir",
+                'lokasi' => $area->nama_area ?? 'Unknown',
             ]);
 
             return redirect()->route('petugas.transaksi.index')
-                ->with('success', "Kendaraan {$kendaraan->plat_nomor} berhasil dicatat masuk ke {$area->nama_area}");
+                ->with('success', "Kendaraan {$kendaraan->plat_nomor} berhasil dicatat masuk ke {$area->nama_area} ({$area->getOccupancyCount()}/{$area->kapasitas})");
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Gagal mencatat transaksi: ' . $e->getMessage());
+                ->with('error', $e->getMessage());
         }
     }
 
     /**
-     * Mark kendaraan keluar (exit) dan langsung tampilkan struk dengan auto-print
+     * Mark kendaraan keluar (exit) dengan perhitungan tarif dari database
      */
     public function keluar($id)
     {
@@ -100,37 +122,56 @@ class PetugasTransaksiController extends Controller
                     ->with('error', 'Transaksi ini sudah selesai.');
             }
 
-            $waktuKeluar = Carbon::now('Asia/Jakarta');
-            $durasiMenit = $transaksi->waktu_masuk->diffInMinutes($waktuKeluar);
+            // Record exit dengan perhitungan tarif dari database
+            $transaksi = $this->transaksiService->recordExit($id, $this->tarifService);
+            
+            // Update area occupancy status
+            $transaksi->area->updateStatusBasedOnOccupancy();
 
-            $tarifAkhir = max(5000, ceil($durasiMenit / 60) * 5000);
-
-            $transaksi->update([
-                'waktu_keluar' => $waktuKeluar,
-                'durasi_menit' => $durasiMenit,
-                'tarif_akhir' => $tarifAkhir,
-                'status' => 'selesai',
+            // Log activity dengan informasi tarif
+            $user = Auth::user();
+            LogAktivitas::create([
+                'user_id' => $user->id,
+                'aktivitas' => "Kendaraan {$transaksi->kendaraan->plat_nomor} keluar parkir ({$transaksi->durasi_menit} menit) - Rp " . number_format($transaksi->tarif_akhir, 0, ',', '.'),
+                'lokasi' => $transaksi->area->nama_area ?? 'Unknown',
             ]);
 
             return redirect()->route('petugas.transaksi.struk', ['id' => $id, 'autoprint' => '1']);
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Gagal memproses keluar: ' . $e->getMessage());
+                ->with('error', $e->getMessage());
         }
     }
 
     /**
-     * View receipt (struk)
+     * View receipt (struk) dengan format yang lebih baik
      */
     public function struk($id)
     {
         try {
             $transaksi = Transaksi::with(['kendaraan', 'area'])->findOrFail($id);
 
-            return view('petugas.struk', compact('transaksi'));
+            // Get tariff information if available
+            $tarif = $this->tarifService->getTariffByType($transaksi->kendaraan->jenis);
+
+            return view('petugas.struk', compact('transaksi', 'tarif'));
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Struk tidak ditemukan.');
+        }
+    }
+
+    /**
+     * Get estimated tariff for a vehicle type
+     * (untuk keperluan informasi/preview)
+     */
+    public function getEstimasiTarif($jenisKendaraan, $durasiMenit)
+    {
+        try {
+            $estimasi = $this->tarifService->estimateTariff($jenisKendaraan, $durasiMenit);
+            return response()->json(['success' => true, 'data' => $estimasi]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
 }

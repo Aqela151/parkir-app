@@ -290,26 +290,19 @@
         <div class="section-title">Log Terbaru</div>
         <div class="section-sub">Aktivitas 1 jam terakhir</div>
         <div class="log-card">
-            <div class="log-item">
-                <span class="log-time">14.32</span>
-                <span class="log-text"><span class="actor">Budi (MOG)</span> login ke sistem</span>
-            </div>
-            <div class="log-item">
-                <span class="log-time">14.28</span>
-                <span class="log-text"><span class="actor">Admin</span> menambah tarif baru</span>
-            </div>
-            <div class="log-item">
-                <span class="log-time">14.15</span>
-                <span class="log-text"><span class="actor">Admin</span> update area zona-C</span>
-            </div>
-            <div class="log-item">
-                <span class="log-time">13.58</span>
-                <span class="log-text"><span class="actor">Sari (Plaza)</span> logout</span>
-            </div>
-            <div class="log-item">
-                <span class="log-time">13.45</span>
-                <span class="log-text"><span class="actor">Roni (Matos)</span> login ke sistem</span>
-            </div>
+            @forelse ($logAktivitas as $log)
+                <div class="log-item">
+                    <span class="log-time">{{ $log->created_at->format('H.i') }}</span>
+                    <span class="log-text">
+                        <span class="actor">{{ $log->user->name }} ({{ $log->user->penempatan ?? 'SYS' }})</span> 
+                        {{ $log->aktivitas }}
+                    </span>
+                </div>
+            @empty
+                <div class="log-item">
+                    <div class="log-text" style="color: #aaa;">Belum ada aktivitas dalam 1 jam terakhir</div>
+                </div>
+            @endforelse
         </div>
     </div>
 </div>
@@ -317,42 +310,107 @@
 @endsection
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    function updateAreaStatus() {
-        fetch('{{ route("admin.api.status-area") }}')
-            .then(response => response.json())
-            .then(data => {
-                const areaItems = document.querySelectorAll('.area-card .area-item');
-                data.forEach((area, index) => {
-                    if (areaItems[index]) {
-                        const item = areaItems[index];
-                        const pct = area.kapasitas > 0 ? Math.round((area.terisi / area.kapasitas) * 100) : 0;
-                        
-                        // Update badge (assuming status is aktif)
-                        const badge = item.querySelector('.area-pct-badge');
-                        if (badge) {
-                            badge.className = `area-pct-badge dark`; // Assuming aktif
-                            badge.textContent = 'Aktif';
-                        }
-                        
-                        // Update progress bar
-                        const barFill = item.querySelector('.area-bar-fill');
-                        if (barFill) {
-                            barFill.style.width = `${pct}%`;
-                        }
-                        
-                        // Update slot text
-                        const slot = item.querySelector('.area-slot');
-                        if (slot) {
-                            slot.textContent = `Terisi ${area.terisi} / ${area.kapasitas} slot`;
-                        }
-                    }
-                });
+(function() {
+    'use strict';
+
+    const API_URL = '{{ route("admin.api.status-area") }}';
+    const UPDATE_INTERVAL = 5000; // 5 detik untuk update lebih cepat
+    let lastData = null;
+
+    // Inisialisasi saat DOM siap
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Admin Dashboard initialized');
+        // Update initial status
+        updateStatusArea();
+        // Set interval untuk update berkala
+        setInterval(updateStatusArea, UPDATE_INTERVAL);
+    });
+
+    /**
+     * Update status area dari API
+     */
+    function updateStatusArea() {
+        fetch(API_URL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
             })
-            .catch(error => console.error('Error updating area status:', error));
+            .then(data => {
+                console.log('API Response:', data);
+                if (data && data.length > 0) {
+                    updateAreaDisplay(data);
+                    lastData = data;
+                }
+            })
+            .catch(error => {
+                console.error('Error updating status area:', error);
+            });
     }
-    
-    // Update every 10 seconds
-    setInterval(updateAreaStatus, 10000);
-});
+
+    /**
+     * Update display area items berdasarkan data API
+     */
+    function updateAreaDisplay(data) {
+        const areaCard = document.querySelector('.area-card');
+        if (!areaCard) {
+            console.log('Area card not found');
+            return;
+        }
+
+        const areaItems = areaCard.querySelectorAll('.area-item');
+        console.log(`Found ${areaItems.length} area items, updating with ${data.length} items from API`);
+
+        data.forEach((area, index) => {
+            if (areaItems[index]) {
+                const item = areaItems[index];
+                console.log(`Updating area ${index}:`, area);
+
+                const pct = area.kapasitas > 0 
+                    ? Math.round((area.terisi / area.kapasitas) * 100) 
+                    : 0;
+
+                // Determine status dan badge class
+                let isFull = area.terisi >= area.kapasitas;
+                let badgeClass = isFull ? 'yellow' : 'dark';
+                let badgeText = isFull ? 'Penuh' : 'Aktif';
+                let barClass = isFull ? 'yellow' : 'dark';
+
+                // Update badge
+                const badge = item.querySelector('.area-pct-badge');
+                if (badge) {
+                    badge.className = `area-pct-badge ${badgeClass}`;
+                    badge.textContent = badgeText;
+                    console.log(`Updated badge to: ${badgeText}`);
+                }
+
+                // Update progress bar container
+                const barBg = item.querySelector('.area-bar-bg');
+                if (barBg) {
+                    // Remove existing bar-fill
+                    const existingFill = barBg.querySelector('.area-bar-fill');
+                    if (existingFill) {
+                        existingFill.remove();
+                    }
+
+                    // Create new bar-fill dengan class yang tepat
+                    const barFill = document.createElement('div');
+                    barFill.className = `area-bar-fill ${barClass}`;
+                    barFill.style.width = `${pct}%`;
+                    barBg.appendChild(barFill);
+                    console.log(`Updated bar width to: ${pct}%, class: ${barClass}`);
+                }
+
+                // Update slot text
+                const slot = item.querySelector('.area-slot');
+                if (slot) {
+                    slot.textContent = `Terisi ${area.terisi} / ${area.kapasitas} slot`;
+                    console.log(`Updated slot to: ${area.terisi}/${area.kapasitas}`);
+                }
+            }
+        });
+    }
+
+})();
 </script>

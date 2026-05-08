@@ -501,6 +501,42 @@
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') tutupModal();
     });
+
+    // ===== REAL-TIME DATA UPDATE =====
+    const UPDATE_INTERVAL = 10000; // 10 detik
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateTerisiData();
+        setInterval(updateTerisiData, UPDATE_INTERVAL);
+    });
+
+    function updateTerisiData() {
+        fetch('{{ route("admin.api.area-parkir") }}')
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                updateTableTerisi(data);
+            })
+            .catch(error => {
+                console.error('Error fetching real-time data:', error);
+            });
+    }
+
+    function updateTableTerisi(data) {
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        rows.forEach((row, index) => {
+            if (data[index]) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    // Update kolom "terisi" (index 4)
+                    cells[4].textContent = data[index].terisi;
+                }
+            }
+        });
+    }
 </script>
 
 @endsection

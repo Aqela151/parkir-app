@@ -23,6 +23,8 @@ class Transaksi extends Model
         'waktu_keluar' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'tarif_sementara' => 'decimal:2',
+        'tarif_akhir' => 'decimal:2',
     ];
 
     public function kendaraan(): BelongsTo
@@ -33,5 +35,38 @@ class Transaksi extends Model
     public function area(): BelongsTo
     {
         return $this->belongsTo(AreaParkir::class, 'area_id');
+    }
+
+    /**
+     * Get the tariff record for this vehicle type
+     */
+    public function tarifParkir(): BelongsTo
+    {
+        return $this->belongsTo(TarifParkir::class, 'jenis_kendaraan', 'jenis_kendaraan')
+            ->through($this->kendaraan());
+    }
+
+    /**
+     * Scope: Get active parking transactions
+     */
+    public function scopeAktif($query)
+    {
+        return $query->where('status', 'parkir');
+    }
+
+    /**
+     * Scope: Get completed transactions
+     */
+    public function scopeSelesai($query)
+    {
+        return $query->where('status', 'selesai');
+    }
+
+    /**
+     * Scope: Get transactions for today
+     */
+    public function scopeHariIni($query)
+    {
+        return $query->whereDate('waktu_masuk', today());
     }
 }

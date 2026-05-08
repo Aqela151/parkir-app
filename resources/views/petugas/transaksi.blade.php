@@ -737,7 +737,7 @@
                             {{ ucfirst($t->kendaraan->jenis ?? '-') }}
                         </span>
                     </td>
-                    <td>{{ \Carbon\Carbon::parse($t->waktu_masuk)->format('H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($t->waktu_masuk)->format('d M H:i') }}</td>
                     <td>{{ $t->area->nama_area ?? '-' }}</td>
                     <td style="color:#888; font-size:12px;">
                         {{ \Carbon\Carbon::parse($t->waktu_masuk)->diffForHumans(null, true) }}

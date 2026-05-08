@@ -1,13 +1,13 @@
-@extends('layouts.app')
 
-@section('title', 'Status Area')
-@section('page-title', 'Status Area')
 
-@section('sidebar')
-    @include('components.sidebar.petugas')
-@endsection
+<?php $__env->startSection('title', 'Status Area'); ?>
+<?php $__env->startSection('page-title', 'Status Area'); ?>
 
-@section('content')
+<?php $__env->startSection('sidebar'); ?>
+    <?php echo $__env->make('components.sidebar.petugas', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
 
 <style>
     /* ===== TOP HEADER ===== */
@@ -145,20 +145,20 @@
     }
 </style>
 
-{{-- TOP HEADER --}}
+
 <div class="top-header">
     <span></span>
     <span class="petugas-panel-badge">PETUGAS PANEL</span>
 </div>
 
-{{-- HEADING --}}
+
 <h1 class="page-heading">Status Area</h1>
 <p class="page-subtitle">Status Real-time Hari Ini</p>
 
-{{-- GRID --}}
+
 <div class="area-grid">
-    @forelse ($statusArea as $area)
-        @php
+    <?php $__empty_1 = true; $__currentLoopData = $statusArea; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $area): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+        <?php
             $pct = ($area['kapasitas'] ?? 0) > 0
                 ? round(($area['terisi'] / $area['kapasitas']) * 100)
                 : null;
@@ -166,50 +166,50 @@
             if ($pct === null)   { $barClass = 'bar-grey';  $badgeType = 'toggle'; }
             elseif ($pct >= 75)  { $barClass = 'bar-dark';  $badgeType = 'dark'; }
             else                 { $barClass = 'bar-gold';  $badgeType = 'yellow'; }
-        @endphp
+        ?>
 
         <div class="area-card">
             <div class="card-header">
-                <span class="card-name">{{ $area['nama'] }}</span>
+                <span class="card-name"><?php echo e($area['nama']); ?></span>
 
-                @if ($badgeType === 'toggle')
+                <?php if($badgeType === 'toggle'): ?>
                     <span class="toggle-badge"></span>
-                @else
-                    <span class="pct-badge {{ $badgeType }}">{{ $pct }}%</span>
-                @endif
+                <?php else: ?>
+                    <span class="pct-badge <?php echo e($badgeType); ?>"><?php echo e($pct); ?>%</span>
+                <?php endif; ?>
             </div>
 
-            <p class="card-address">{{ $area['alamat'] ?? '' }}</p>
+            <p class="card-address"><?php echo e($area['alamat'] ?? ''); ?></p>
 
             <div class="progress-wrap">
-                <div class="progress-bar {{ $barClass }}" style="width: {{ $pct ?? 0 }}%"></div>
+                <div class="progress-bar <?php echo e($barClass); ?>" style="width: <?php echo e($pct ?? 0); ?>%"></div>
             </div>
 
             <div class="stats-row">
-                @if ($pct !== null)
-                    <span class="stat-lbl">{{ $area['terisi'] }} terisi</span>
-                    <span class="stat-lbl">{{ $area['kapasitas'] - $area['terisi'] }} tersedia</span>
-                @else
+                <?php if($pct !== null): ?>
+                    <span class="stat-lbl"><?php echo e($area['terisi']); ?> terisi</span>
+                    <span class="stat-lbl"><?php echo e($area['kapasitas'] - $area['terisi']); ?> tersedia</span>
+                <?php else: ?>
                     <span class="stat-lbl"></span>
-                @endif
-                <span class="stat-lbl">{{ $area['kapasitas'] }} total</span>
+                <?php endif; ?>
+                <span class="stat-lbl"><?php echo e($area['kapasitas']); ?> total</span>
             </div>
         </div>
 
-    @empty
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <div class="area-card" style="grid-column:1/-1; text-align:center; color:#bbb; padding:48px 20px; font-size:13px;">
             Belum ada data area parkir.
         </div>
-    @endforelse
+    <?php endif; ?>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
 <script>
 (function() {
     'use strict';
 
-    const API_URL = '{{ route("petugas.api.status-area") }}';
+    const API_URL = '<?php echo e(route("petugas.api.status-area")); ?>';
     const UPDATE_INTERVAL = 10000; // 10 detik
 
     // Inisialisasi saat DOM siap
@@ -290,3 +290,4 @@
 
 })();
 </script>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DELL LATITUDE 3301\parkir-app\resources\views/petugas/status-area.blade.php ENDPATH**/ ?>
